@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SmartHealthcare.Application/SmartHealthcare.Application.csproj" />
+    <Project Path="src/SmartHealthcare.Domain/SmartHealthcare.Domain.csproj" />
+    <Project Path="src/SmartHealthcare.Infrastructure/SmartHealthcare.Infrastructure.csproj" />
+    <Project Path="src/SmartHealthcare.Persistence/SmartHealthcare.Persistence.csproj" />
+    <Project Path="src/SmartHealthcare.Shared/SmartHealthcare.Shared.csproj" />
+  </Folder>
+  <Folder Name="/src/SmartHealthcare.API/">
+    <Project Path="src/SmartHealthcare.API/SmartHealthCare.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SmartHealthcare.UnitTests/SmartHealthcare.UnitTests.csproj" />
+  </Folder>
+</Solution>
