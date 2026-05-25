@@ -1,7 +1,7 @@
 ﻿
-namespace SmartHealthcare.Application.DTOs.Auth
+namespace SmartHealthcare.Application.Features.Auth.Commands.Login
 {
-    public class LoginDto
+    public class LoginCommand
     {
         public string Email { get; set; }
 

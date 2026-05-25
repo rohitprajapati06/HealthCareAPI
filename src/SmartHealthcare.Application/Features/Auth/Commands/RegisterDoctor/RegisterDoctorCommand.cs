@@ -1,8 +1,8 @@
 ﻿
 
-namespace SmartHealthcare.Application.DTOs.Auth
+namespace SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient
 {
-    public class RegisterDoctorDto
+    public class RegisterDoctorCommand
     {
         public string FirstName { get; set; }
 

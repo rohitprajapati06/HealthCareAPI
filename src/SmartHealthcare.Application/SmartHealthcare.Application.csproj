@@ -7,10 +7,31 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Features\" />
-    <Folder Include="Mapping\" />
-    <Folder Include="Behaviors\" />
-    <Folder Include="Validators\" />
+    <Compile Remove="Behaviors\**" />
+    <Compile Remove="Mapping\**" />
+    <Compile Remove="Validators\**" />
+    <EmbeddedResource Remove="Behaviors\**" />
+    <EmbeddedResource Remove="Mapping\**" />
+    <EmbeddedResource Remove="Validators\**" />
+    <None Remove="Behaviors\**" />
+    <None Remove="Mapping\**" />
+    <None Remove="Validators\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\Exceptions\" />
+    <Folder Include="Common\Models\" />
+    <Folder Include="Common\Behaviors\" />
+    <Folder Include="Common\Settings\" />
+    <Folder Include="Common\Responses\" />
+    <Folder Include="Contracts\Infrastructure\" />
+    <Folder Include="Contracts\Identity\" />
+    <Folder Include="Contracts\Services\" />
+    <Folder Include="Contracts\Persistence\" />
+    <Folder Include="Features\Auth\Commands\Logout\" />
+    <Folder Include="Features\Auth\Commands\RefreshToken\" />
+    <Folder Include="Features\Auth\Mapping\" />
+    <Folder Include="Features\Auth\Queries\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SmartHealthcare.Application.Configurations
+namespace SmartHealthcare.Application.Common.Settings
 {
     public class JwtSettings
     {

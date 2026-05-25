@@ -2,7 +2,7 @@
 
 namespace SmartHealthcare.Application.DTOs.Auth
 {
-    public class RegisterPatientDto
+    public class RegisterPatientCommand
     {
         public string FirstName { get; set; }
 

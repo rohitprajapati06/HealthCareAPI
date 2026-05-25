@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using SmartHealthcare.Application.Configurations;
+using SmartHealthcare.Application.Common.Settings;
+using SmartHealthcare.Application.Contracts.Identity;
 using SmartHealthcare.Application.DTOs;
-using SmartHealthcare.Application.Interfaces;
+using SmartHealthcare.Application.Features.Auth.Responses;
 using SmartHealthcare.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace SmartHealthcare.Infrastructure.Authentication
         }
         
 
-        public async Task<AuthResponseDto> GenerateTokenAsync(ApplicationUser user)
+        public async Task<AuthResponse> GenerateTokenAsync(ApplicationUser user)
         {
             var roles = await userManager.GetRolesAsync( user );
 
@@ -62,7 +63,7 @@ namespace SmartHealthcare.Infrastructure.Authentication
             var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
             var refreshToken = GenerateRefreshToken();
 
-            return new AuthResponseDto
+            return new AuthResponse
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,

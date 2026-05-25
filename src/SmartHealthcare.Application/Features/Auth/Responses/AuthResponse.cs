@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SmartHealthcare.Application.DTOs
+namespace SmartHealthcare.Application.Features.Auth.Responses
 {
-    public class AuthResponseDto
+    public class AuthResponse
     {
         public string AccessToken { get; set; }
 
