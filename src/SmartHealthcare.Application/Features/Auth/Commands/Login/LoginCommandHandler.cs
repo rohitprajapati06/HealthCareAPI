@@ -1,10 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
+using SmartHealthcare.Application.Contracts.Identity;
+using SmartHealthcare.Application.Contracts.Persistence;
+using SmartHealthcare.Application.Features.Auth.Responses;
+using SmartHealthcare.Domain.Entities;
+
 
 namespace SmartHealthcare.Application.Features.Auth.Commands.Login
 {
-    internal class LoginCommandHandler
+    public class LoginCommandHandler:IRequestHandler<LoginCommand,AuthResponse>
     {
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly IJwtTokenService jwtTokenService;
+        private readonly IApplicationDbContext context;
+
+        public LoginCommandHandler(UserManager<ApplicationUser> userManager , IJwtTokenService jwtTokenService ,IApplicationDbContext context)
+        {
+            this.userManager = userManager;
+            this.jwtTokenService = jwtTokenService;
+            this.context = context;
+        }
+        public async Task<AuthResponse> Handle(LoginCommand request , CancellationToken cancellationToken)
+        {
+            var user = await userManager.FindByEmailAsync(request.Email);
+
+            if(user == null)
+            {
+                throw new UnauthorizedAccessException("No User Found");
+            }
+
+            var isValidPassword = await userManager.CheckPasswordAsync(user, request.Password);
+
+            if (!isValidPassword)
+            {
+                throw new UnauthorizedAccessException("Invalid Credentails");
+            }
+
+            var authresponse = await jwtTokenService.GenerateTokenAsync(user);
+
+            var refreshtoken = new RefreshToken
+            {
+                UserId = user.Id,
+                Token = authresponse.RefreshToken,
+                ExpiryDate = DateTime.UtcNow.AddDays(7)
+            };
+
+            await context.RefreshTokens.AddAsync(refreshtoken);
+
+            await context.SaveChangesAsync(cancellationToken);
+
+            return authresponse;
+        }
     }
 }

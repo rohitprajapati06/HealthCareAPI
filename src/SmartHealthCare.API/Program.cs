@@ -2,10 +2,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SmartHealthcare.Application;
 using SmartHealthcare.Application.Common.Settings;
 using SmartHealthcare.Application.Contracts.Identity;
 using SmartHealthcare.Domain.Entities;
+using SmartHealthcare.Infrastructure;
 using SmartHealthcare.Infrastructure.Authentication;
+using SmartHealthcare.Persistence;
 using SmartHealthcare.Persistence.Contexts;
 using SmartHealthcare.Persistence.Seed;
 using System.Text;
@@ -16,6 +19,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Controllers
 builder.Services.AddControllers();
 
+builder.Services.AddApplication();
+
+builder.Services.AddInfrastucture(builder.Configuration);
+
+builder.Services.AddPersistance(builder.Configuration);
+
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -25,7 +34,6 @@ builder.Services.AddSwaggerGen();
 //JWT Settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
-builder.Services.AddScoped<IJwtTokenService,JwtTokenService>();
 
 var jwtsettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 if (jwtsettings == null || string.IsNullOrEmpty(jwtsettings.Secret))
@@ -55,12 +63,6 @@ builder.Services.AddAuthentication(options =>
 
     };
 });
-
-// SQL Server
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
-
 
 // Identity
 builder.Services

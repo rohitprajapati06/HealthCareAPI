@@ -3,11 +3,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SmartHealthcare.Application.Common.Settings;
 using SmartHealthcare.Application.Contracts.Identity;
-using SmartHealthcare.Application.DTOs;
 using SmartHealthcare.Application.Features.Auth.Responses;
 using SmartHealthcare.Domain.Entities;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -42,7 +39,7 @@ namespace SmartHealthcare.Infrastructure.Authentication
                 new Claim(ClaimTypes.Email, user.Email)
             };
 
-            foreach (var role in roles) 
+            foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }

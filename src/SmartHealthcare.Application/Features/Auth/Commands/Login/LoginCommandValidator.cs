@@ -1,10 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using FluentValidation;
+
 
 namespace SmartHealthcare.Application.Features.Auth.Commands.Login
 {
-    internal class LoginCommandValidator
+    public class LoginCommandValidator:AbstractValidator<LoginCommand>
     {
+        public LoginCommandValidator()
+        {
+            RuleFor(x => x.Email).NotEmpty().EmailAddress();
+            RuleFor(x => x.Password).NotEmpty();
+        }
     }
 }

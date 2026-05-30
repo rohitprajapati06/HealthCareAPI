@@ -27,7 +27,6 @@
     <Folder Include="Contracts\Infrastructure\" />
     <Folder Include="Contracts\Identity\" />
     <Folder Include="Contracts\Services\" />
-    <Folder Include="Contracts\Persistence\" />
     <Folder Include="Features\Auth\Commands\Logout\" />
     <Folder Include="Features\Auth\Commands\RefreshToken\" />
     <Folder Include="Features\Auth\Mapping\" />
