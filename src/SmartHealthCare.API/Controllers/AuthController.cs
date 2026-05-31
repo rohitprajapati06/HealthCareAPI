@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmartHealthcare.Application.Features.Auth.Commands.Login;
+using SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient;
 
 namespace SmartHealthCare.API.Controllers;
 
@@ -23,5 +24,13 @@ public class AuthController : ControllerBase
         var result = await mediator.Send(command);
         return Ok(result);
     }
+
+    [HttpPost("register/patient")]
+    public async Task<IActionResult> RegisterPatient(RegisterPatientCommand command)
+    {
+        var result = await mediator.Send(command);
+        return Ok(result);
+    }
+    
 
 }
