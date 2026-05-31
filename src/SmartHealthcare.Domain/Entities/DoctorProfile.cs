@@ -14,11 +14,11 @@ namespace SmartHealthcare.Domain.Entities
 
         public Hospital Hospital { get; set; }
 
-        public string Specialiization { get; set; }
+        public string Specialization { get; set; }
 
         public int ExperienceYears { get; set; }    
 
-        public decimal ConsultantionFee { get; set; }
+        public decimal ConsultationFee { get; set; }
 
         public string Qualification {  get; set; }
 

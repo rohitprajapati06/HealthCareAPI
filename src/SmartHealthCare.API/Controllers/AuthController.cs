@@ -31,6 +31,13 @@ public class AuthController : ControllerBase
         var result = await mediator.Send(command);
         return Ok(result);
     }
+
+    [HttpPost("register/doctor")]
+    public async Task<IActionResult> RegisterDoctor(RegisterDoctorCommand command) 
+    { 
+        var result = await mediator.Send(command);
+        return Ok(result);
+    }
     
 
 }

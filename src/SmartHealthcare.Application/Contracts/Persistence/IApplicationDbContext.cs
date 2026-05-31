@@ -12,6 +12,10 @@ namespace SmartHealthcare.Application.Contracts.Persistence
 
         DbSet<PatientProfile> PatientProfiles { get; }
 
+        DbSet<DoctorProfile> DoctorProfiles { get; }
+
+        DbSet<Hospital> Hospitals { get; }
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

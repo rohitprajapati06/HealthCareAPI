@@ -4,6 +4,8 @@ namespace SmartHealthcare.Domain.Entities;
 
 public class Hospital : BaseEntity
 {
+    public string RohiniCode { get; set; }
+
     public string Name { get; set; }
 
     public string Address { get; set; }
@@ -14,9 +16,11 @@ public class Hospital : BaseEntity
 
     public string Country { get; set; }
 
-    public string ContactEmail { get; set; }
+    public string? ContactEmail { get; set; }
 
-    public string ContactPhone { get; set; }
+    public string? ContactPhone { get; set; }
+
+    public bool IsActive { get; set; } = true;
 
     public ICollection<ApplicationUser> Users { get; set; }
 
