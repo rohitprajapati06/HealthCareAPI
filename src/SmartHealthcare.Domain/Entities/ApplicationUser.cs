@@ -5,15 +5,15 @@ namespace SmartHealthcare.Domain.Entities
 {
     public class ApplicationUser:IdentityUser<Guid>
     {
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
 
         public bool IsActive { get; set; }
 
         public Guid? HospitalId { get; set;}
 
-        public Hospital Hospital { get; set; }
+        public Hospital Hospital { get; set; } 
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 

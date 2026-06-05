@@ -14,13 +14,13 @@ namespace SmartHealthcare.Domain.Entities
 
         public Hospital Hospital { get; set; }
 
-        public string Specialization { get; set; }
+        public string Specialization { get; set; } = string.Empty;
 
         public int ExperienceYears { get; set; }    
 
         public decimal ConsultationFee { get; set; }
 
-        public string Qualification {  get; set; }
+        public string Qualification {  get; set; } = string.Empty;
 
         public DoctorApprovalStatus ApprovalStatus { get; set; } = DoctorApprovalStatus.Pending;
 

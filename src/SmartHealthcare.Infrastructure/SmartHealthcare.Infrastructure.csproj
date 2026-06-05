@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0" />
   </ItemGroup>
@@ -14,7 +15,6 @@
   <ItemGroup>
     <Folder Include="Email\" />
     <Folder Include="Storage\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>

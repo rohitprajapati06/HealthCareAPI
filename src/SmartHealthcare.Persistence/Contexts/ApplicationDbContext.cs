@@ -32,6 +32,8 @@ namespace SmartHealthcare.Persistence.Contexts
         {
             base.OnModelCreating(builder);
 
+            builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
             ConfigureIdentityTables(builder);
 
             ConfigureRelationships(builder);
