@@ -17,6 +17,10 @@ namespace SmartHealthcare.Infrastructure
 
             services.AddScoped<IHospitalImportService,HospitalImportService>();
 
+            services.AddScoped<ICurrentUserService,CurrentUserService>();
+
+            services.AddHttpContextAccessor();
+
             return services;
         }
     }

@@ -24,12 +24,9 @@
     <Folder Include="Common\Behaviors\" />
     <Folder Include="Common\Settings\" />
     <Folder Include="Common\Responses\" />
-    <Folder Include="Contracts\Identity\" />
     <Folder Include="Contracts\Infrastructure\" />
     <Folder Include="Features\Auth\Commands\Logout\" />
-    <Folder Include="Features\Auth\Commands\RefreshToken\" />
     <Folder Include="Features\Auth\Mapping\" />
-    <Folder Include="Features\Auth\Queries\" />
   </ItemGroup>
 
   <ItemGroup>

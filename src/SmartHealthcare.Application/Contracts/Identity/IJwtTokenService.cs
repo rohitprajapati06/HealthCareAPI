@@ -7,5 +7,7 @@ namespace SmartHealthcare.Application.Contracts.Identity
     public interface IJwtTokenService
     {
         Task<AuthResponse> GenerateTokenAsync(ApplicationUser user);
+
+        Task<AuthResponse> RefreshTokenAsync(string refreshtoken);
     }
 }

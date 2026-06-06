@@ -1,8 +1,10 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartHealthcare.Application.Features.Auth.Commands.Login;
+using SmartHealthcare.Application.Features.Auth.Commands.RefreshUserToken;
 using SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient;
+using SmartHealthcare.Application.Features.Auth.Queries.GetCurrentUser;
 
 namespace SmartHealthCare.API.Controllers;
 
@@ -38,6 +40,20 @@ public class AuthController : ControllerBase
         var result = await mediator.Send(command);
         return Ok(result);
     }
-    
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        var result = await mediator.Send(new GetCurrentUserQuery());
+        return Ok(result);
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> GetRefreshToken(RefreshTokenCommand command)
+    {
+        var result = await mediator.Send(command);
+        return Ok(result);
+    }
 
 }

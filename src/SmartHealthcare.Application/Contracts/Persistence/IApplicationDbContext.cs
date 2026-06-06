@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartHealthcare.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace SmartHealthcare.Application.Contracts.Persistence
 {

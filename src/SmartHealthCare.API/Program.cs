@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SmartHealthcare.Application;
 using SmartHealthcare.Application.Common.Settings;
-using SmartHealthcare.Application.Contracts.Identity;
 using SmartHealthcare.Domain.Entities;
 using SmartHealthcare.Infrastructure;
-using SmartHealthcare.Infrastructure.Authentication;
 using SmartHealthcare.Persistence;
 using SmartHealthcare.Persistence.Contexts;
 using SmartHealthcare.Persistence.Seed;
@@ -29,7 +27,37 @@ builder.Services.AddPersistance(builder.Configuration);
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer",
+        new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Enter JWT Token"
+        });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new List<string>()
+        }
+    });
+});
+
+
 
 //JWT Settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -66,30 +94,21 @@ builder.Services.AddAuthentication(options =>
 
 // Identity
 builder.Services
-    .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+    .AddIdentityCore<ApplicationUser>(options =>
     {
         // Password
         options.Password.RequiredLength = 8;
-
         options.Password.RequireDigit = true;
-
         options.Password.RequireUppercase = true;
-
         options.Password.RequireLowercase = true;
-
         options.Password.RequireNonAlphanumeric = false;
-
-
         // Lockout
         options.Lockout.MaxFailedAccessAttempts = 5;
-
-        options.Lockout.DefaultLockoutTimeSpan =
-            TimeSpan.FromMinutes(15);
-
-
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
         // User
         options.User.RequireUniqueEmail = true;
     })
+    .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 

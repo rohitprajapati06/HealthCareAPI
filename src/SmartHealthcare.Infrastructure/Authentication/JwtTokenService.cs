@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SmartHealthcare.Application.Common.Settings;
 using SmartHealthcare.Application.Contracts.Identity;
+using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Auth.Responses;
 using SmartHealthcare.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,12 +18,14 @@ namespace SmartHealthcare.Infrastructure.Authentication
     {
         private readonly JwtSettings jwtsettings;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IApplicationDbContext context;
 
-        public JwtTokenService(IOptions<JwtSettings> jwtsettings , UserManager<ApplicationUser> userManager )
+        public JwtTokenService(IOptions<JwtSettings> jwtsettings , UserManager<ApplicationUser> userManager ,IApplicationDbContext context)
         {
 
             this.jwtsettings = jwtsettings.Value;
             this.userManager = userManager;
+            this.context = context;
         }
         
 
@@ -78,6 +82,50 @@ namespace SmartHealthcare.Infrastructure.Authentication
             rng.GetBytes(randombytes);
 
             return Convert.ToBase64String(randombytes);
+        }
+
+        public async Task<AuthResponse> RefreshTokenAsync(string refreshtoken)
+        {
+            var storedrefreshtoken = await context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshtoken);
+
+            if(storedrefreshtoken == null)
+            {
+                throw new Exception("Invalid Refresh Token");
+            }
+
+            if (storedrefreshtoken.IsRevoked)
+            {
+                throw new UnauthorizedAccessException("refresh Token Revoked");
+            }
+
+            if(storedrefreshtoken.ExpiryDate <= DateTime.UtcNow)
+            {
+                throw new UnauthorizedAccessException("Refresh Token is Expired");
+            }
+
+            var user = await userManager.FindByIdAsync(storedrefreshtoken.UserId.ToString());
+
+            if(user == null)
+            {
+                throw new UnauthorizedAccessException("User not found");
+            }
+
+            var authResponse = await GenerateTokenAsync(user);
+
+            storedrefreshtoken.IsRevoked = true;
+
+            var  newRefreshtoken = new RefreshToken
+            {
+                UserId = user.Id,
+                Token = authResponse.RefreshToken,
+                ExpiryDate = DateTime.UtcNow.AddDays(7),
+                IsRevoked = false
+            };
+
+            await context.RefreshTokens.AddAsync(newRefreshtoken);
+            await context.SaveChangesAsync();
+
+            return authResponse;
         }
     }
 }
