@@ -127,5 +127,18 @@ namespace SmartHealthcare.Infrastructure.Authentication
 
             return authResponse;
         }
+
+        public async Task LogoutAsync(string refreshtoken)
+        {
+            var token = await context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshtoken);
+
+            if(token == null)
+            {
+                throw new UnauthorizedAccessException("Refresh Token Not Found");
+            }
+
+            token.IsRevoked = true;
+            await context.SaveChangesAsync();
+        }
     }
 }

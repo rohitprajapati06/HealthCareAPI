@@ -9,5 +9,7 @@ namespace SmartHealthcare.Application.Contracts.Identity
         Task<AuthResponse> GenerateTokenAsync(ApplicationUser user);
 
         Task<AuthResponse> RefreshTokenAsync(string refreshtoken);
+
+        Task LogoutAsync(string refreshtoken);
     }
 }

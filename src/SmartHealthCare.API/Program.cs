@@ -9,6 +9,7 @@ using SmartHealthcare.Infrastructure;
 using SmartHealthcare.Persistence;
 using SmartHealthcare.Persistence.Contexts;
 using SmartHealthcare.Persistence.Seed;
+using SmartHealthCare.API.Extensions;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -125,6 +126,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseGlobalExceptionMidddleware();
 
 app.UseAuthentication();
 
