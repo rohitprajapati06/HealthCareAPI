@@ -11,9 +11,13 @@ using SmartHealthcare.Persistence.Contexts;
 using SmartHealthcare.Persistence.Seed;
 using SmartHealthCare.API.Extensions;
 using System.Text;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog();
+
+Log.Logger = new LoggerConfiguration().WriteTo.Console().WriteTo.File("Logs/log-.txt",rollingInterval:RollingInterval.Day).CreateLogger();
 
 // Add Controllers
 builder.Services.AddControllers();
@@ -143,5 +147,7 @@ using (var scope = app.Services.CreateScope())
 
     await SuperAdminSeeder.SuperAdminSeederAsync(services);
 }
+
+Log.Information("SmartHealth Care API Started Successfully");
 
 app.Run();

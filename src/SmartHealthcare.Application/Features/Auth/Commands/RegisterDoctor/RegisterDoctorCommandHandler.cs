@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient;
 using SmartHealthcare.Domain.Entities;
@@ -12,11 +13,13 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.RegisterDoctor
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IApplicationDbContext context;
+        private readonly ILogger<RegisterDoctorCommandHandler> logger;
 
-        public RegisterDoctorCommandHandler(UserManager<ApplicationUser> userManager , IApplicationDbContext context) 
+        public RegisterDoctorCommandHandler(UserManager<ApplicationUser> userManager , IApplicationDbContext context , ILogger<RegisterDoctorCommandHandler> logger) 
         {
             this.userManager = userManager;
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Guid> Handle(RegisterDoctorCommand request , CancellationToken cancellationToken)
@@ -61,6 +64,8 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.RegisterDoctor
 
             await context.DoctorProfiles.AddAsync(doctorprofiles,cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation($"{user.Id} {user.HospitalId} doctor has been successfully registered");
 
             return user.Id;
         }

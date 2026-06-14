@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Contracts.Identity;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Auth.Responses;
@@ -13,12 +14,14 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.Login
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IJwtTokenService jwtTokenService;
         private readonly IApplicationDbContext context;
+        private readonly ILogger<LoginCommandHandler> logger;
 
-        public LoginCommandHandler(UserManager<ApplicationUser> userManager , IJwtTokenService jwtTokenService ,IApplicationDbContext context)
+        public LoginCommandHandler(UserManager<ApplicationUser> userManager , IJwtTokenService jwtTokenService ,IApplicationDbContext context , ILogger<LoginCommandHandler> logger)
         {
             this.userManager = userManager;
             this.jwtTokenService = jwtTokenService;
             this.context = context;
+            this.logger = logger;
         }
         public async Task<AuthResponse> Handle(LoginCommand request , CancellationToken cancellationToken)
         {
@@ -48,6 +51,8 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.Login
             await context.RefreshTokens.AddAsync(refreshtoken);
 
             await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation($"{user.Id} user has loggen in successfully"); 
 
             return authresponse;
         }

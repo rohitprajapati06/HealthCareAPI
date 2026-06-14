@@ -24,6 +24,7 @@ namespace SmartHealthCare.API.Middlewares
             catch (Exception ex)
             {
                 logger.LogError(ex, ex.Message);
+                logger.LogError(ex,"Unhandled Exception for {Method} {Path}",context.Request.Method , context.Request.Path);
                 await HandleExceptionAsync(context,ex );
             }
         }

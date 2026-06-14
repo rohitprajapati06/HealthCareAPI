@@ -1,7 +1,8 @@
-﻿using System.Reflection;
-using FluentValidation;
+﻿using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using SmartHealthcare.Application.Behaviors;
+using System.Reflection;
 
 namespace SmartHealthcare.Application
 {
@@ -12,7 +13,9 @@ namespace SmartHealthcare.Application
             services.AddMediatR(typeof(DependencyInjection).Assembly);
             services.AddValidatorsFromAssemblies(
                 new[] { Assembly.GetExecutingAssembly() });
-            
+
+            services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
+
             return services;
 
         }

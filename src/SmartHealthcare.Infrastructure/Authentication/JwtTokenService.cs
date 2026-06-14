@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SmartHealthcare.Application.Common.Settings;
@@ -19,13 +20,15 @@ namespace SmartHealthcare.Infrastructure.Authentication
         private readonly JwtSettings jwtsettings;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IApplicationDbContext context;
+        private readonly ILogger<JwtTokenService> logger;
 
-        public JwtTokenService(IOptions<JwtSettings> jwtsettings , UserManager<ApplicationUser> userManager ,IApplicationDbContext context)
+        public JwtTokenService(IOptions<JwtSettings> jwtsettings , UserManager<ApplicationUser> userManager ,IApplicationDbContext context , ILogger<JwtTokenService> logger)
         {
 
             this.jwtsettings = jwtsettings.Value;
             this.userManager = userManager;
             this.context = context;
+            this.logger = logger;
         }
         
 
@@ -138,6 +141,7 @@ namespace SmartHealthcare.Infrastructure.Authentication
             }
 
             token.IsRevoked = true;
+            logger.LogInformation("Refresh Token is revoked");
             await context.SaveChangesAsync();
         }
     }

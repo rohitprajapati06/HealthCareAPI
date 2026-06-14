@@ -17,16 +17,20 @@ namespace SmartHealthCare.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IMediator mediator;
+    private readonly ILogger<AuthController> logger;
 
-    public AuthController(IMediator mediator)
+    public AuthController(IMediator mediator , ILogger<AuthController> logger)
     {
         this.mediator = mediator;
+        this.logger = logger;
     }
 
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginCommand command)
     {
+        logger.LogInformation("Login Endpoint Invoked");
+
         var result = await mediator.Send(command);
         return Ok(result);
     }
@@ -34,13 +38,15 @@ public class AuthController : ControllerBase
     [HttpPost("register/patient")]
     public async Task<IActionResult> RegisterPatient(RegisterPatientCommand command)
     {
+        logger.LogInformation("Patient Endpoint Invoked");
         var result = await mediator.Send(command);
         return Ok(result);
     }
 
     [HttpPost("register/doctor")]
     public async Task<IActionResult> RegisterDoctor(RegisterDoctorCommand command) 
-    { 
+    {
+        logger.LogInformation("Doctor Endpoint Invoked");
         var result = await mediator.Send(command);
         return Ok(result);
     }
@@ -49,6 +55,7 @@ public class AuthController : ControllerBase
     [HttpGet("me")]
     public async Task<IActionResult> GetCurrentUser()
     {
+        logger.LogInformation($"{nameof(GetCurrentUser)}"); 
         var result = await mediator.Send(new GetCurrentUserQuery());
         return Ok(result);
     }
@@ -56,6 +63,7 @@ public class AuthController : ControllerBase
     [HttpPost("refresh-token")]
     public async Task<IActionResult> GetRefreshToken(RefreshTokenCommand command)
     {
+        logger.LogInformation("Refresh-token Endpoint Invoked");
         var result = await mediator.Send(command);
         return Ok(result);
     }
@@ -63,6 +71,7 @@ public class AuthController : ControllerBase
     [HttpPost("logout")]
     public async Task<IActionResult> Logout(LogoutCommand command)
     {
+        logger.LogInformation("Logout Endpoint Invoked");
         var result = await mediator.Send(command);
         return Ok(result);
     }
@@ -71,6 +80,8 @@ public class AuthController : ControllerBase
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword(ChangePasswordCommand command) 
     {
+        logger.LogInformation("Change-Password Endpoint Invoked");
+
         var result = await mediator.Send(command);
         return Ok(result);
     }
@@ -78,6 +89,7 @@ public class AuthController : ControllerBase
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordCommand command)
     {
+        logger.LogInformation("Forgot-Password Endpoint Invoked");
         var result = await mediator.Send(command);
         return Ok(result); 
     }
@@ -85,6 +97,8 @@ public class AuthController : ControllerBase
     [HttpGet("reset-password")]
     public IActionResult ResetPasswordForm([FromQuery] string email, [FromQuery] string token)
     {
+        logger.LogInformation("reset-password Endpoint Invoked");
+
         // Just returns the values so you can copy them cleanly
         return Ok(new { email, token });
     }

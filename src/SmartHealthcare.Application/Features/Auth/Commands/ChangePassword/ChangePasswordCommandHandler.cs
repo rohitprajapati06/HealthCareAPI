@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Contracts.Identity;
 using SmartHealthcare.Domain.Entities;
 
@@ -10,11 +11,13 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.ChangePassword
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly ICurrentUserService currentUser;
+        private readonly ILogger<ChangePasswordCommandHandler> logger;
 
-        public ChangePasswordCommandHandler(UserManager<ApplicationUser> userManager,ICurrentUserService currentUser )
+        public ChangePasswordCommandHandler(UserManager<ApplicationUser> userManager,ICurrentUserService currentUser ,ILogger<ChangePasswordCommandHandler> logger)
         {
             this.userManager = userManager;
             this.currentUser = currentUser;
+            this.logger = logger;
         }
 
         public async Task<bool> Handle(ChangePasswordCommand request , CancellationToken cancellationToken)
@@ -39,6 +42,8 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.ChangePassword
             {
                 throw new Exception(String.Join(" ", result.Errors.Select(x => x.Description)));
             }
+
+            logger.LogInformation($" Password has been changed for {user.Id}");
 
             return true;
         }
