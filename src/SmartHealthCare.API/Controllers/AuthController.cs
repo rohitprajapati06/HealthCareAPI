@@ -9,6 +9,9 @@ using SmartHealthcare.Application.Features.Auth.Commands.RefreshUserToken;
 using SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient;
 using SmartHealthcare.Application.Features.Auth.Commands.ResetPassword;
 using SmartHealthcare.Application.Features.Auth.Queries.GetCurrentUser;
+using SmartHealthcare.Application.Features.Auth.Responses;
+using SmartHealthcare.Domain.Entities;
+using SmartHealthCare.API.Models;
 
 namespace SmartHealthCare.API.Controllers;
 
@@ -32,7 +35,12 @@ public class AuthController : ControllerBase
         logger.LogInformation("Login Endpoint Invoked");
 
         var result = await mediator.Send(command);
-        return Ok(result);
+        return Ok(new ApiResponse<AuthResponse>
+        {
+            Success = true,
+            Message = "Login Successful",
+            Data = result
+        });
     }
 
     [HttpPost("register/patient")]
@@ -40,7 +48,12 @@ public class AuthController : ControllerBase
     {
         logger.LogInformation("Patient Endpoint Invoked");
         var result = await mediator.Send(command);
-        return Ok(result);
+        return Ok(new ApiResponse<Guid>
+        {
+            Success = true,
+            Message = "Patient Registered",
+            Data = result
+        });
     }
 
     [HttpPost("register/doctor")]
@@ -48,7 +61,12 @@ public class AuthController : ControllerBase
     {
         logger.LogInformation("Doctor Endpoint Invoked");
         var result = await mediator.Send(command);
-        return Ok(result);
+        return Ok(new ApiResponse<Guid>
+        {
+            Success =true,
+            Message = "Doctor Registered",
+            Data = result
+        });
     }
 
     [Authorize]
@@ -57,7 +75,12 @@ public class AuthController : ControllerBase
     {
         logger.LogInformation($"{nameof(GetCurrentUser)}"); 
         var result = await mediator.Send(new GetCurrentUserQuery());
-        return Ok(result);
+        return Ok(new ApiResponse<CurrentUserResponse>
+        {
+            Success = true,
+            Message = "User details",
+            Data = result
+        });
     }
 
     [HttpPost("refresh-token")]
@@ -65,7 +88,12 @@ public class AuthController : ControllerBase
     {
         logger.LogInformation("Refresh-token Endpoint Invoked");
         var result = await mediator.Send(command);
-        return Ok(result);
+        return Ok(new ApiResponse<AuthResponse>
+        {
+            Success =true,
+            Message = "Refresh token generated",
+            Data = result
+        });
     }
 
     [HttpPost("logout")]
@@ -73,7 +101,11 @@ public class AuthController : ControllerBase
     {
         logger.LogInformation("Logout Endpoint Invoked");
         var result = await mediator.Send(command);
-        return Ok(result);
+        return Ok(new ApiResponse
+        {
+            Success =true,
+            Message = "Logout Success"
+        });
     }
 
     [Authorize]
@@ -83,7 +115,11 @@ public class AuthController : ControllerBase
         logger.LogInformation("Change-Password Endpoint Invoked");
 
         var result = await mediator.Send(command);
-        return Ok(result);
+        return Ok(new ApiResponse
+        {
+            Success=true,
+            Message = "Password Change Successfully"
+        });
     }
 
     [HttpPost("forgot-password")]
@@ -91,8 +127,10 @@ public class AuthController : ControllerBase
     {
         logger.LogInformation("Forgot-Password Endpoint Invoked");
         var result = await mediator.Send(command);
-        return Ok(result); 
+        return Ok(new ApiResponse { Success = true,Message = "Password reset link sent "}); 
     }
+
+
     // Testing only — remove when frontend is ready
     [HttpGet("reset-password")]
     public IActionResult ResetPasswordForm([FromQuery] string email, [FromQuery] string token)
@@ -106,6 +144,10 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> ResetPassword(ResetPasswordCommand command)
     {
         var result = await mediator.Send(command);
-        return Ok(result);
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Message = " Password has been reset"
+        });
     }
 }
