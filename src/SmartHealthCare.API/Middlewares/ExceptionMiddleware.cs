@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using SmartHealthCare.API.Models;
 using System.Net;
 using System.Text.Json;
 
@@ -23,7 +24,6 @@ namespace SmartHealthCare.API.Middlewares
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message);
                 logger.LogError(ex,"Unhandled Exception for {Method} {Path}",context.Request.Method , context.Request.Path);
                 await HandleExceptionAsync(context,ex );
             }
@@ -32,31 +32,37 @@ namespace SmartHealthCare.API.Middlewares
         private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
             context.Response.ContentType = "application/json";
-            var responsemessage = new
-            {
-                Message = ex.Message,
-            };
+            ApiResponse response = new();
 
             switch (ex)
             {
                 case UnauthorizedAccessException:
                     context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    response.Success = false;
+                    response.Message = ex.Message;
                     break;
 
-                case ValidationException:
+                case ValidationException validationException:
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    response.Success = false;
+                    response.Message = "Validation Failed";
+                    response.Errors = validationException.Errors.Select(x => x.ErrorMessage).ToList();
                     break;
 
                 case KeyNotFoundException:
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    response.Success = false;
+                    response.Message = ex.Message;
                     break;
 
                 default:
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    response.Success = false;
+                    response.Message = ex.Message;
                     break;
             }
 
-            await context.Response.WriteAsync(JsonSerializer.Serialize(responsemessage));
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
         }
     }
 }
