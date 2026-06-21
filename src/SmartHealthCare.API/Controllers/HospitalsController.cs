@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmartHealthcare.Application.Features.Hospitals.Commands.ImportHospitals;
+using SmartHealthcare.Application.Features.Hospitals.Queries.GetHospitalById;
 using SmartHealthcare.Application.Features.Hospitals.Queries.GetHospitals;
 
 namespace SmartHealthCare.API.Controllers
@@ -18,9 +19,8 @@ namespace SmartHealthCare.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetHospitals(int id) 
+        public async Task<IActionResult> GetHospitals() 
         {
-            
             return Ok( await mediator.Send(new GetHospitalsQuery()));
         }
 
@@ -34,5 +34,13 @@ namespace SmartHealthCare.API.Controllers
                 Message = "Hospital import completed"
             });
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetHospitalsById(Guid id)
+        {
+            return Ok(await mediator.Send(new GetHospitalByIdQuery(id)));
+        }
+
+
     }
 }

@@ -10,7 +10,6 @@ using SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient;
 using SmartHealthcare.Application.Features.Auth.Commands.ResetPassword;
 using SmartHealthcare.Application.Features.Auth.Queries.GetCurrentUser;
 using SmartHealthcare.Application.Features.Auth.Responses;
-using SmartHealthcare.Domain.Entities;
 using SmartHealthCare.API.Models;
 
 namespace SmartHealthCare.API.Controllers;
