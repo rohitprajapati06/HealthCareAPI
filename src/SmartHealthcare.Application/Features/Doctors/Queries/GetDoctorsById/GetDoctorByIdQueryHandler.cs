@@ -8,7 +8,7 @@ using SmartHealthcare.Domain.Enums;
 
 namespace SmartHealthcare.Application.Features.Doctors.Queries.GetDoctorsById
 {
-    public class GetDoctorByIdQueryHandler:IRequestHandler<GetDoctorsByIdQuery,List<DoctorResponse>>
+    public class GetDoctorByIdQueryHandler:IRequestHandler<GetDoctorsByIdQuery,DoctorResponse>
     {
         private readonly IApplicationDbContext dbContext;
 
@@ -17,27 +17,32 @@ namespace SmartHealthcare.Application.Features.Doctors.Queries.GetDoctorsById
             this.dbContext = dbContext;
         }
 
-        public async Task<List<DoctorResponse>> Handle(GetDoctorsByIdQuery request , CancellationToken cancellationToken)
+        public async Task<DoctorResponse> Handle(GetDoctorsByIdQuery request , CancellationToken cancellationToken)
         {
-            return await dbContext.DoctorProfiles
+            var doctors = await dbContext.DoctorProfiles
                 .Include(x => x.User)
                 .Include(x => x.Hospital)
-                .Where(x => x.ApprovalStatus == DoctorApprovalStatus.Approved)
-                .Select(x => new DoctorResponse
-                {
-                    Id = x.User.Id,
-                    UserId = x.User.Id,
-                    Email = x.User.Email,
-                    FirstName = x.User.FirstName,
-                    LastName = x.User.LastName,
-                    ExperienceYears = x.ExperienceYears,
-                    Qualification = x.Qualification,
-                    HospitalName = x.Hospital.Name,
-                    Specialization = x.Specialization,           
-                    ConsultationFee = x.ConsultationFee,
-                    
-                    
-                }).ToListAsync(cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == request.Id,cancellationToken);
+
+            if(doctors == null)
+            {
+                throw new Exception("Doctor Not Found");
+            }
+
+            return new DoctorResponse
+            {
+                Id = doctors.Id,
+                UserId = doctors.UserId,
+                Email = doctors.User.Email,
+                FirstName = doctors.User.FirstName,
+                LastName = doctors.User.LastName,
+                Specialization = doctors.Specialization,
+                ExperienceYears = doctors.ExperienceYears,
+                HospitalName = doctors.Hospital.Name,   
+                ConsultationFee = doctors.ConsultationFee,
+                Qualification = doctors.Qualification,
+            };
+            
         }
     }
 }

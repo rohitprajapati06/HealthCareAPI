@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartHealthcare.Application.Features.Doctors.Commands.ApproveDoctors;
 using SmartHealthcare.Application.Features.Doctors.Commands.RejectDoctors;
 using SmartHealthcare.Application.Features.Doctors.Queries.GetDoctors;
+using SmartHealthcare.Application.Features.Doctors.Queries.GetDoctorsById;
 using SmartHealthcare.Application.Features.Doctors.Queries.SearchDoctors;
 
 namespace SmartHealthCare.API.Controllers
@@ -27,11 +28,11 @@ namespace SmartHealthCare.API.Controllers
         }
 
 
-        //[HttpGet("{id}")]
-        //public async Task<IActionResult> GetDoctorsById(int id)
-        //{
-        //    return Ok(await mediator.Send(new GetDoctorsQuery()));
-        //}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDoctorsById(Guid id)
+        {
+            return Ok(await mediator.Send(new GetDoctorsByIdQuery(id)));
+        }
 
 
         //[Authorize(Roles = "HospitalAdmin,SuperAdmin")]
@@ -48,7 +49,7 @@ namespace SmartHealthCare.API.Controllers
             return Ok(await mediator.Send(new RejectDoctorCommands(id)));
         }
 
-        [HttpGet("Search Doctors")]
+        [HttpGet("Search")]
         public async Task<IActionResult> SearchDoctors( [FromQuery] Guid? HospitalId , [FromQuery]string? Specialization, 
             [FromQuery] int? Experience , [FromQuery]int? MaxFee, [FromQuery]int? MinFee)
         {
