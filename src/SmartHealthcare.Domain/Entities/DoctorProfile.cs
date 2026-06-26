@@ -24,10 +24,11 @@ namespace SmartHealthcare.Domain.Entities
 
         public DoctorApprovalStatus ApprovalStatus { get; set; } = DoctorApprovalStatus.Pending;
 
-        public ICollection<Appointment> Appointments { get; set; }
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 
-        public ICollection<Prescription> Prescriptions { get; set; }
+        public ICollection<Prescription> Prescriptions { get; set; } = new List<Prescription>();
 
+        public ICollection<AvailabilitySlot> AvailabilitySlots { get; set; } = new List<AvailabilitySlot>();
 
 
     }

@@ -22,9 +22,9 @@ public class Hospital : BaseEntity
 
     public bool IsActive { get; set; } = true;
 
-    public ICollection<ApplicationUser> Users { get; set; }
+    public ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
 
-    public ICollection<DoctorProfile> Doctors { get; set; }
+    public ICollection<DoctorProfile> Doctors { get; set; } = new List<DoctorProfile>();
 
-    public ICollection<Appointment> Appointments { get; set; }
+    public ICollection<Appointment> Appointments { get; set; }  = new List<Appointment>();
 }

@@ -28,6 +28,8 @@ namespace SmartHealthcare.Persistence.Contexts
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
+        public DbSet<AvailabilitySlot> AvailabilitySlots { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
