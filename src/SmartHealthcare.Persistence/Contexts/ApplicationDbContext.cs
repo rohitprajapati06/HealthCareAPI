@@ -128,6 +128,12 @@ namespace SmartHealthcare.Persistence.Contexts
                 .WithMany(p => p.MedicalRecords)
                 .HasForeignKey(m => m.PatientId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<AvailabilitySlot>()
+                .HasOne(a => a.Doctor)
+                .WithMany(d => d.AvailabilitySlots)
+                .HasForeignKey(a => a.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

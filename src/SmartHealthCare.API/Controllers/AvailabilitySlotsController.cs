@@ -19,6 +19,7 @@ namespace SmartHealthCare.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Guid doctorId ,CreateAvailabilitySlot command )
         {
+            command.DoctorId = doctorId;
             var id = await mediator.Send(command);
 
             return Ok(id);
