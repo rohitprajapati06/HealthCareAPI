@@ -8,7 +8,7 @@ namespace SmartHealthcare.Domain.Entities
     {
         public Guid DoctorId { get; set; }
 
-        public DoctorProfile DoctorProfile { get; set; }
+        public DoctorProfile Doctor { get; set; }
 
         public DateOnly Date { get; set; }
 
@@ -16,6 +16,6 @@ namespace SmartHealthcare.Domain.Entities
 
         public TimeOnly EndTime { get; set; }   
 
-        public bool IsBooked { get; set; }
+        public bool IsBooked { get; set; } = false;
     }
 }
