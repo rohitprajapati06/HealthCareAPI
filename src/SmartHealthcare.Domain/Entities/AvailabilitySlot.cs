@@ -17,5 +17,7 @@ namespace SmartHealthcare.Domain.Entities
         public TimeOnly EndTime { get; set; }   
 
         public bool IsBooked { get; set; } = false;
+
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }

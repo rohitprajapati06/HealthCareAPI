@@ -18,9 +18,13 @@ namespace SmartHealthcare.Domain.Entities
         public Hospital Hospital {  get; set; }
 
 
-        public DateTime AppointmentDate { get; set; }
+        public Guid AvailabilitySlotId {  get; set; }
+        public AvailabilitySlot AvailabilitySlot { get; set; } = default!;
 
+
+        public DateTime AppointmentDate { get; set; }
         public AppointmentStatus Status { get; set; } = AppointmentStatus.Pending;
+
 
         public string? Notes { get; set; }  = string.Empty;
 

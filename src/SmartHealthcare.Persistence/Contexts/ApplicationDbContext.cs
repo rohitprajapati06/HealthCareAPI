@@ -117,6 +117,12 @@ namespace SmartHealthcare.Persistence.Contexts
                 .HasForeignKey(a => a.HospitalId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Appointment>()
+                .HasOne(a => a.AvailabilitySlot)
+                .WithMany(s => s.Appointments)
+                .HasForeignKey(a => a.AvailabilitySlotId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Prescription>()
                 .HasOne(p => p.Appointment)
                 .WithOne(a => a.Prescription)
