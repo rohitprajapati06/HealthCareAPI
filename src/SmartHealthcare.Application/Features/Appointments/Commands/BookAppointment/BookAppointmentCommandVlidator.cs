@@ -1,9 +1,6 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace SmartHealthcare.Application.Features.Appointment.Commands.BookAppointment
+namespace SmartHealthcare.Application.Features.Appointments.Commands.BookAppointment
 {
     public class BookAppointmentCommandVlidator:AbstractValidator<BookAppointmentCommand>
     {
@@ -11,7 +8,11 @@ namespace SmartHealthcare.Application.Features.Appointment.Commands.BookAppointm
         {
             RuleFor(x => x.DoctorId).NotEmpty();
 
-            RuleFor(x => x.AppointmentDate).GreaterThan(DateTime.UtcNow).NotEmpty();
+            RuleFor(x => x.PatientId).NotEmpty();
+
+            RuleFor(x => x.HospitalId).NotEmpty();
+
+            RuleFor(x => x.AvailabilitySlotId).NotEmpty();
 
             RuleFor(x => x.Notes).MaximumLength(500);
         }

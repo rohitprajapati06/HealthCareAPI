@@ -1,0 +1,51 @@
+﻿
+
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Contracts.Persistence;
+using SmartHealthcare.Domain.Entities;
+using SmartHealthcare.Domain.Enums;
+
+namespace SmartHealthcare.Application.Features.Appointments.Commands.CancelAppointment
+{
+    public class CancelAppointmentCommandHandler : IRequestHandler<CancelAppointmentCommand,Unit>
+    {
+        private readonly IApplicationDbContext context;
+
+        public CancelAppointmentCommandHandler(IApplicationDbContext context)
+        {
+            this.context = context;
+        }
+
+        public async Task<Unit> Handle(CancelAppointmentCommand request , CancellationToken cancellationToken)
+        {
+            var appointment = await context.Appointments
+                .Include(x => x.AvailabilitySlot)
+                .FirstOrDefaultAsync(x => x.Id == request.AppointmentId);
+
+            if(appointment == null)
+            {
+                throw new Exception("Appointment not found");
+            }
+
+            if(appointment.Status == AppointmentStatus.Cancelled)
+            {
+                throw new Exception("Appointment is already cancelled");
+            }
+
+            if(appointment.Status == AppointmentStatus.Completed)
+            {
+                throw new Exception("Appointment is already completed");
+            }
+
+            appointment.Status = AppointmentStatus.Cancelled;
+
+            appointment.AvailabilitySlot.IsBooked = false;
+
+            await context.SaveChangesAsync(cancellationToken);
+
+            return Unit.Value;
+
+        }
+    }
+}
