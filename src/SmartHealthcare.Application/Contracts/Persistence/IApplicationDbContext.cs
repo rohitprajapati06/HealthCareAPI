@@ -18,6 +18,8 @@ namespace SmartHealthcare.Application.Contracts.Persistence
 
         DbSet<AvailabilitySlot> AvailabilitySlots { get; }
 
+        DbSet<Prescription> Prescriptions { get; }
+
 
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
