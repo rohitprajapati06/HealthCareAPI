@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Enums;
 
@@ -24,22 +25,22 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.RescheduleA
 
             if(appointments == null)
             {
-                throw new Exception("Appointment not found");
+                throw new NotFoundException("Appointment not found");
             }
 
             if(appointments.Status != AppointmentStatus.Pending)
             {
-                throw new Exception("Appointment is not Pending");
+                throw new BadRequestException("Appointment is not Pending");
             }
 
             if(appointments.Status == AppointmentStatus.Completed)
             {
-                throw new Exception("Appointment has been compeleted");
+                throw new BadRequestException("Appointment has been compeleted");
             }
 
             if(appointments.Status == AppointmentStatus.Cancelled)
             {
-                throw new Exception("Appointment has been cancelled");
+                throw new BadRequestException("Appointment has been cancelled");
             }
 
 
@@ -47,17 +48,17 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.RescheduleA
 
             if(newSlot == null)
             {
-                throw new Exception("Slot not found");
+                throw new NotFoundException("Slot not found");
             }
 
             if (newSlot.IsBooked)
             {
-                throw new Exception("Slot is already book");
+                throw new ConflictException("Slot is already book");
             }
 
             if(newSlot.DoctorId != appointments.DoctorId)
             {
-                throw new Exception("The slot does not belong to the doctor");
+                throw new ForbiddenException("The slot does not belong to the doctor");
 
             }
 

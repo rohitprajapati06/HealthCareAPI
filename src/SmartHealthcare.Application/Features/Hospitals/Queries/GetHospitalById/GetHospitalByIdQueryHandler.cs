@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Hospitals.Responses;
 
@@ -21,7 +22,7 @@ namespace SmartHealthcare.Application.Features.Hospitals.Queries.GetHospitalById
             var hospital = await context.Hospitals.Where(x => x.IsActive).FirstOrDefaultAsync(x => x.Id == request.Id);
 
             if (hospital == null) {
-                throw new Exception("Hospital not found");
+                throw new NotFoundException("Hospital not found");
             }
 
             return new HospitalResponse

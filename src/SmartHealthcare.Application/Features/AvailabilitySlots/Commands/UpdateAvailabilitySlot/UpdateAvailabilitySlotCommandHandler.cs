@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 
 namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.UpdateAvailabilitySlot
@@ -22,27 +23,27 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Update
 
             if(slot == null)
             {
-                throw new Exception("There is no slots booked");
+                throw new NotFoundException("There is no slots booked");
             }
 
             if(slot.DoctorId != request.DoctorId)
             {
-                throw new Exception("You cannot update the another doctors slots ");
+                throw new ForbiddenException("You cannot update the another doctors slots ");
             }
 
             if (slot.IsBooked)
             {
-                throw new Exception("There is no slot available");
+                throw new ConflictException("There is no slot available");
             }
 
             if(slot.Date < DateOnly.FromDateTime(DateTime.Today))
             {
-                throw new Exception("You cannot update the past date slots");
+                throw new ConflictException("You cannot update the past date slots");
             }
 
             if(request.EndTime <= request.StartTime)
             {
-                throw new Exception("End time must be greater than the start time");
+                throw new ConflictException("End time must be greater than the start time");
             }
 
             var overlap = await context.AvailabilitySlots
@@ -51,7 +52,7 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Update
 
             if (overlap)
             {
-                throw new Exception("This slot is overlap with another slot");
+                throw new ConflictException("This slot is overlap with another slot");
             }    
                  
             slot.Date = request.Date;

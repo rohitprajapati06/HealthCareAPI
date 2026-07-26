@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Entities;
 using SmartHealthcare.Domain.Enums;
@@ -25,17 +26,17 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.CancelAppoi
 
             if(appointment == null)
             {
-                throw new Exception("Appointment not found");
+                throw new NotFoundException("Appointment not found");
             }
 
             if(appointment.Status == AppointmentStatus.Cancelled)
             {
-                throw new Exception("Appointment is already cancelled");
+                throw new BadRequestException("Appointment is already cancelled");
             }
 
             if(appointment.Status == AppointmentStatus.Completed)
             {
-                throw new Exception("Appointment is already completed");
+                throw new BadRequestException("Appointment is already completed");
             }
 
             appointment.Status = AppointmentStatus.Cancelled;

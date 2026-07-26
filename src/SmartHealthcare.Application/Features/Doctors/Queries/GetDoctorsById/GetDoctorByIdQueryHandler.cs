@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Doctors.Responses;
 using SmartHealthcare.Domain.Enums;
@@ -26,7 +27,7 @@ namespace SmartHealthcare.Application.Features.Doctors.Queries.GetDoctorsById
 
             if(doctors == null)
             {
-                throw new Exception("Doctor Not Found");
+                throw new NotFoundException("Doctor Not Found");
             }
 
             return new DoctorResponse

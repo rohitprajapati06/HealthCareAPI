@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Domain.Entities;
 using System.Text;
 
@@ -31,7 +32,7 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.ResetPassword
             var result = await userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
             if (!result.Succeeded)
             {
-                throw new Exception(String.Join(" ", result.Errors.Select(x => x.Description)));
+                throw new BadRequestException(String.Join(" ", result.Errors.Select(x => x.Description)));
             }
 
             logger.LogInformation($" Password reset request is invoked for {user.Id} ");

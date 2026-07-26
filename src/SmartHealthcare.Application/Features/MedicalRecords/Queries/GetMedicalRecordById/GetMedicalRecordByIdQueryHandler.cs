@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.MedicalRecords.Responses;
 
@@ -26,7 +27,7 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Queries.GetMedical
 
             if(records == null)
             {
-                throw new Exception("No Medical Record found");
+                throw new NotFoundException("No Medical Record found");
             }
 
              return new MedicalRecordResponse

@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Entities;
 
@@ -22,7 +23,7 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.UpdateMed
 
             if(recordId == null)
             {
-                throw new Exception("No Medical Record has been found");
+                throw new NotFoundException("No Medical Record has been found");
             }
 
                 recordId.FileName = request.FileName;

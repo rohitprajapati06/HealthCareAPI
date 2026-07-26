@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Entities;
 using SmartHealthcare.Domain.Enums;
@@ -24,22 +25,22 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Create
 
             if(doctors == null)
             {
-                throw new Exception("Doctor not found");
+                throw new NotFoundException("Doctor not found");
             }
 
             if(doctors.ApprovalStatus != DoctorApprovalStatus.Approved)
             {
-                throw new Exception("Doctor is Not Approved");
+                throw new ForbiddenException("Doctor is Not Approved");
             }
 
             if(request.Date < DateOnly.FromDateTime(DateTime.Today))
             {
-                throw new Exception("Cannot create slots for past dates.");
+                throw new ConflictException("Cannot create slots for past dates.");
             }
 
             if(request.EndTime <= request.StartTime)
             {
-                throw new Exception("End time must be greater than start time");
+                throw new ConflictException("End time must be greater than start time");
             }
 
             bool overlap = await context.AvailabilitySlots.AnyAsync(x => x.DoctorId == request.DoctorId && x.Date == request.Date &&
@@ -47,7 +48,7 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Create
 
             if (overlap)
             {
-                throw new Exception("Overlapping exists with the existing slot ");
+                throw new ConflictException("Overlapping exists with the existing slot ");
             }
 
             var slot = new AvailabilitySlot

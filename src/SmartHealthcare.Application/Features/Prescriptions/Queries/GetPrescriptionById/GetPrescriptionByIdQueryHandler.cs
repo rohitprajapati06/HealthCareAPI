@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Prescriptions.Responses;
 using SmartHealthcare.Domain.Entities;
@@ -25,7 +26,7 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Queries.GetPrescrip
 
             if(prescription == null)
             {
-                throw new Exception("Prescription not found");
+                throw new NotFoundException("Prescription not found");
             }
 
             return new PrescriptionsResponses

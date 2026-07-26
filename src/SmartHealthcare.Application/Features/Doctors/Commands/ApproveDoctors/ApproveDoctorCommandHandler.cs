@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Enums;
 using System;
@@ -23,7 +24,7 @@ namespace SmartHealthcare.Application.Features.Doctors.Commands.ApproveDoctors
 
             if(doctors == null)
             {
-                throw new Exception("Doctor Not Found");
+                throw new NotFoundException("Doctor Not Found");
             }
 
              doctors.ApprovalStatus = DoctorApprovalStatus.Approved;

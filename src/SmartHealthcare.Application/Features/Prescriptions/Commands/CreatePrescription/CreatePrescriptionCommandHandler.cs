@@ -1,6 +1,7 @@
 ﻿
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Prescriptions.Responses;
 using SmartHealthcare.Domain.Entities;
@@ -25,22 +26,22 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Commands.CreatePres
 
             if(appointments == null)
             {
-                throw new Exception("Appointment not found");
+                throw new NotFoundException("Appointment not found");
             }
 
             if(appointments.Status != AppointmentStatus.Completed)
             {
-                throw new Exception("Appointment is not completed yet");
+                throw new ConflictException("Appointment is not completed yet");
             }
 
             if(appointments.Prescription != null)
             {
-                throw new Exception("Prescription has been already provided");
+                throw new BadRequestException("Prescription has been already provided");
             }
 
             if(appointments.DoctorId != request.DoctorId)
             {
-                throw new Exception("Only the assigned doctor can create a prescription.");
+                throw new ForbiddenException("Only the assigned doctor can create a prescription.");
             }
 
             var prescription = new Prescription

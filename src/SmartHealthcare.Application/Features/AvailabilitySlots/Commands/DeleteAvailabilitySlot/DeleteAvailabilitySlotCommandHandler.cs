@@ -1,6 +1,7 @@
 ﻿
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using System.Runtime.CompilerServices;
 
@@ -21,17 +22,17 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Delete
 
             if(slotId == null)
             {
-                throw new Exception("There is no slot exist");
+                throw new NotFoundException("There is no slot exist");
             }
 
             if(slotId.DoctorId != request.DoctorId)
             {
-                throw new Exception("You cannot delete the other doctors appointment");
+                throw new ConflictException("You cannot delete the other doctors appointment");
             }
 
             if (slotId.IsBooked)
             {
-                throw new Exception("You cannot delete the booked slots");
+                throw new ConflictException("You cannot delete the booked slots");
             }
 
              context.AvailabilitySlots.Remove(slotId);

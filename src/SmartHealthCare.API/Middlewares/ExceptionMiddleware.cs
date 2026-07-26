@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthCare.API.Models;
 using System.Net;
 using System.Text.Json;
@@ -49,16 +50,36 @@ namespace SmartHealthCare.API.Middlewares
                     response.Errors = validationException.Errors.Select(x => x.ErrorMessage).ToList();
                     break;
 
-                case KeyNotFoundException:
-                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                case NotFoundException:
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
                     response.Success = false;
                     response.Message = ex.Message;
                     break;
 
+                case ConflictException:
+                    context.Response.StatusCode = StatusCodes.Status409Conflict;
+                    response.Success = false;
+                    response.Message = ex.Message;
+                    break;
+
+                case BadRequestException:
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    response.Success = false;
+                    response.Message = ex.Message;
+                    break;
+
+
+                case ForbiddenException:
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    response.Success = false;
+                    response.Message = ex.Message;
+                    break;
+
+
                 default:
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     response.Success = false;
-                    response.Message = ex.Message;
+                    response.Message = "An unexpected error occurred.";
                     break;
             }
 

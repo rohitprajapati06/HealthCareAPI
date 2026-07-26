@@ -1,6 +1,8 @@
 ﻿
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Dashboard.Responses;
 using SmartHealthcare.Domain.Enums;
@@ -22,7 +24,7 @@ namespace SmartHealthcare.Application.Features.Dashboard.Queries.GetPatientDashb
 
             if(patientId == null)
             {
-                throw new ArgumentException("Patient Not Found");
+                throw new NotFoundException("Patient Not Found");
             }
 
             var response = new PatientDashboardResponse

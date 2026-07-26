@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Identity;
 using SmartHealthcare.Domain.Entities;
 
@@ -40,7 +41,7 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.ChangePassword
 
             if (!result.Succeeded)
             {
-                throw new Exception(String.Join(" ", result.Errors.Select(x => x.Description)));
+                throw new ForbiddenException(String.Join(" ", result.Errors.Select(x => x.Description)));
             }
 
             logger.LogInformation($" Password has been changed for {user.Id}");

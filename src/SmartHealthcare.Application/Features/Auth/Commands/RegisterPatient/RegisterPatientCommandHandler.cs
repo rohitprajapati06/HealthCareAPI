@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Auth.Commands.Login;
 using SmartHealthcare.Domain.Entities;
@@ -28,7 +29,7 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient
 
             if(existingUser != null)
             {
-                throw new Exception("Email Already Exists");
+                throw new ConflictException("Email Already Exists");
 
             }
 
@@ -46,7 +47,7 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient
 
             if (!result.Succeeded) 
             {
-                throw new Exception( string.Join(" ",result.Errors.Select(x => x.Description)));
+                throw new BadRequestException( string.Join(" ",result.Errors.Select(x => x.Description)));
             }
 
             await userManager.AddToRoleAsync(user,"Patient");

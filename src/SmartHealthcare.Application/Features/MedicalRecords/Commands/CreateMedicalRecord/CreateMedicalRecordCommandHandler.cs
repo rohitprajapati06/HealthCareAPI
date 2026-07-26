@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Entities;
 
@@ -21,14 +22,14 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
             var patient = await context.PatientProfiles.FirstOrDefaultAsync(x => x.Id == request.Id,cancellationToken);
 
             if(patient == null) {
-                throw new Exception("Patient not found");
+                throw new NotFoundException("Patient not found");
             }
 
             var hospital = await context.Hospitals.FirstOrDefaultAsync(x => x.Id == request.HospitalId,cancellationToken);
 
             if(hospital == null)
             {
-                throw new Exception("Hospitals not found");
+                throw new NotFoundException("Hospitals not found");
             }
 
             var medicalrecord = new MedicalRecord

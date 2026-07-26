@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Identity;
 using SmartHealthcare.Application.Features.Auth.Responses;
 using SmartHealthcare.Domain.Entities;
@@ -24,7 +25,7 @@ namespace SmartHealthcare.Application.Features.Auth.Queries.GetCurrentUser
             var userId = currentUserService.UserId;
 
             if (userId == null) {
-                throw new Exception("User is not Authenticated");
+                throw new UnauthorizedAccessException("User is not Authenticated");
 
             }
 
@@ -32,7 +33,7 @@ namespace SmartHealthcare.Application.Features.Auth.Queries.GetCurrentUser
 
             if (user == null)
             {
-                throw new Exception("User not found");
+                throw new NotFoundException("User not found");
             }
 
             var roles = await userManager.GetRolesAsync(user);

@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 
 namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.DeleteMedicalRecord
@@ -21,7 +22,7 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.DeleteMed
 
             if(recordId == null)
             {
-                throw new Exception("Medical Record not found");
+                throw new NotFoundException("Medical Record not found");
             }
 
              context.MedicalRecords.Remove(recordId);

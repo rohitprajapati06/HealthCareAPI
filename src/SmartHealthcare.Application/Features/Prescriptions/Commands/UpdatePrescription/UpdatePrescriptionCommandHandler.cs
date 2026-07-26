@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 
 
@@ -20,7 +21,7 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Commands.UpdatePres
 
             if(prescriptions == null)
             {
-                throw new Exception("Prescription not found");
+                throw new NotFoundException("Prescription not found");
             }
 
             prescriptions.Instructions = request.Instruction;
