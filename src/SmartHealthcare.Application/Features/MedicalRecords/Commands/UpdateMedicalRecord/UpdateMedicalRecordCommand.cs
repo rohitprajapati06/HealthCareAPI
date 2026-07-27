@@ -1,5 +1,6 @@
 ﻿
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.UpdateMedicalRecord
 {
@@ -7,9 +8,7 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.UpdateMed
     {
         public Guid Id { get; set; }
 
-        public string FileName { get; set; } = string.Empty;
-
-        public string FileUrl { get; set; } = string.Empty;
+        public IFormFile? File { get; set; }
 
         public string RecordType { get; set; } = string.Empty;
     }

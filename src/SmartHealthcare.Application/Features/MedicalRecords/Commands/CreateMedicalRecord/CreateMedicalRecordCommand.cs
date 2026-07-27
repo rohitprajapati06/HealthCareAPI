@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMedicalRecord
 {
@@ -7,8 +8,9 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
         public Guid Id { get; set; }
 
         public Guid HospitalId { get; set; }
-        public string FileName { get; set; } = string.Empty;
-        public string FileUrl { get; set; } = string.Empty;
+
+        public IFormFile File { get; set; } = default!;
+
         public string RecordType { get; set; } = string.Empty;
     }
 }

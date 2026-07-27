@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
+using SmartHealthcare.Application.Common.Interface;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Entities;
 
@@ -13,11 +14,13 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
     {
         private readonly IApplicationDbContext context;
         private readonly ILogger logger;
+        private readonly IFileStorageService fileStorageService;
 
-        public CreateMedicalRecordCommandHandler(IApplicationDbContext context , ILogger logger)
+        public CreateMedicalRecordCommandHandler(IApplicationDbContext context , ILogger logger , IFileStorageService fileStorageService)
         {
             this.context = context;
             this.logger = logger;
+            this.fileStorageService = fileStorageService;
         }
 
         public async Task<Guid> Handle(CreateMedicalRecordCommand request , CancellationToken cancellationToken)
@@ -35,12 +38,14 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
                 throw new NotFoundException("Hospitals not found");
             }
 
+            var uploadResult = await fileStorageService.UploadAsync(request.File,"medicalrecords",cancellationToken);
+
             var medicalrecord = new MedicalRecord
             {
                 Id = request.Id,
                 HospitalId = request.HospitalId,
-                FileName = request.FileName,
-                FileUrl = request.FileUrl,
+                FileName = uploadResult.FileName,
+                FileUrl = uploadResult.FileURL,
                 RecordType = request.RecordType
             };
             await context.MedicalRecords.AddAsync(medicalrecord);

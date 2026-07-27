@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMedicalRecord;
 using SmartHealthcare.Application.Features.MedicalRecords.Commands.DeleteMedicalRecord;
@@ -21,39 +20,47 @@ namespace SmartHealthCare.API.Controllers
         }
 
         [HttpPost("CreateMedicalRecord")]
-        
-        public async Task<IActionResult> CreateMedicalRecord(CreateMedicalRecordCommand command)
+        public async Task<IActionResult> CreateMedicalRecord(
+            [FromForm] CreateMedicalRecordCommand command)
         {
             var result = await mediator.Send(command);
             return Ok(result);
         }
 
-        [HttpGet("GetMedicalRecords/{Id}")]
-        public async Task<IActionResult> GetMedicalRecordsById(Guid Id) 
+
+        [HttpGet("GetMedicalRecords/{id}")]
+        public async Task<IActionResult> GetMedicalRecordsById(Guid id)
         {
-            var result = await mediator.Send(new GetMedicalRecordById(Id));
+            var result = await mediator.Send(
+                new GetMedicalRecordById(id));
+
             return Ok(result);
         }
 
         [HttpGet("GetPatientMedicalRecords/{patientId}")]
-        public async Task<IActionResult> GetPatientMedicalRecords(Guid paitentId)
+        public async Task<IActionResult> GetPatientMedicalRecords(Guid patientId)
         {
-            var result = await mediator.Send(new GetPatientMedicalRecordsQuery(paitentId));
+            var result = await mediator.Send(
+                new GetPatientMedicalRecordsQuery(patientId));
+
             return Ok(result);
         }
+
 
         [HttpPut("UpdateMedicalRecordsById/{id}")]
-        public async Task<IActionResult> UpdateMedicalRecordsById(Guid id , UpdateMedicalRecordCommand command)
+        public async Task<IActionResult> UpdateMedicalRecordsById(Guid id,[FromForm] UpdateMedicalRecordCommand command)
         {
             command.Id = id;
-            var result = await mediator.Send(command);
-            return Ok(result);
+            await mediator.Send(command);
+            return NoContent();
         }
 
+
         [HttpDelete("DeleteMedicalRecordId/{id}")]
-        public async Task<IActionResult> DeleteMedicalRecordsById(Guid id,DeleteMedicalRecordCommand command)
+        public async Task<IActionResult> DeleteMedicalRecordsById(Guid id)
         {
-            await mediator.Send(command);
+            await mediator.Send(new DeleteMedicalRecordCommand(id));
+
             return NoContent();
         }
     }
