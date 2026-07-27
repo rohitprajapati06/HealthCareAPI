@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 
@@ -10,10 +11,12 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.DeleteMed
     public class DeleteMedicalRecordCommandHandler : IRequestHandler<DeleteMedicalRecordCommand,Unit>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public DeleteMedicalRecordCommandHandler(IApplicationDbContext context)
+        public DeleteMedicalRecordCommandHandler(IApplicationDbContext context , ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Unit> Handle(DeleteMedicalRecordCommand request , CancellationToken cancellationToken)
@@ -27,6 +30,8 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.DeleteMed
 
              context.MedicalRecords.Remove(recordId);
             await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation($"Delete Medical Records - {request.Id}");
 
             return Unit.Value;
 

@@ -1,20 +1,20 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
-using SmartHealthcare.Domain.Entities;
-
-
 
 namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.UpdateMedicalRecord
 {
     public class UpdateMedicalRecordCommandHandler : IRequestHandler<UpdateMedicalRecordCommand,Unit>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public UpdateMedicalRecordCommandHandler(IApplicationDbContext context)
+        public UpdateMedicalRecordCommandHandler(IApplicationDbContext context , ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Unit> Handle(UpdateMedicalRecordCommand request , CancellationToken cancellationToken)
@@ -31,6 +31,8 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.UpdateMed
                 recordId.RecordType = request.RecordType;
             
             await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation($" Medical record updated - {request.Id}");
 
             return Unit.Value;
         }

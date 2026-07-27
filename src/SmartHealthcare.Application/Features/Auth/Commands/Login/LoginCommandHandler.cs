@@ -36,6 +36,7 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.Login
 
             if (!isValidPassword)
             {
+                logger.LogWarning($"Failed Login attempt {request.Email}");
                 throw new UnauthorizedAccessException("Invalid Credentails");
             }
 

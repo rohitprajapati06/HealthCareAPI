@@ -2,11 +2,13 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SmartHealthcare.Application.Common.Interface;
 using SmartHealthcare.Application.Common.Settings;
 using SmartHealthcare.Application.Contracts.Identity;
 using SmartHealthcare.Application.Contracts.Services;
 using SmartHealthcare.Infrastructure.Authentication;
 using SmartHealthcare.Infrastructure.Email;
+using SmartHealthcare.Infrastructure.Options;
 using SmartHealthcare.Infrastructure.Services;
 
 namespace SmartHealthcare.Infrastructure
@@ -25,6 +27,9 @@ namespace SmartHealthcare.Infrastructure
 
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.AddScoped<IEmailService, EmailService>();
+
+            services.Configure<FileStorageOptions>(configuration.GetSection(FileStorageOptions.SectionName));
+            services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
             return services;
         }

@@ -1,6 +1,7 @@
 ﻿
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Prescriptions.Responses;
@@ -12,10 +13,12 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Commands.CreatePres
     public class CreatePrescriptionCommandHandler : IRequestHandler<CreatePrescriptionCommand,Guid>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public CreatePrescriptionCommandHandler(IApplicationDbContext context)
+        public CreatePrescriptionCommandHandler(IApplicationDbContext context , ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Guid> Handle(CreatePrescriptionCommand request , CancellationToken cancellationToken)
@@ -55,6 +58,8 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Commands.CreatePres
            await context.Prescriptions.AddAsync(prescription);
            
            await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation($" Prescriptionn created - {prescription.Id}");
             
             return prescription.Id;
         }

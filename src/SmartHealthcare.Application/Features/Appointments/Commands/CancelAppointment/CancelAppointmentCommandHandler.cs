@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Entities;
@@ -12,10 +13,12 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.CancelAppoi
     public class CancelAppointmentCommandHandler : IRequestHandler<CancelAppointmentCommand,Unit>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public CancelAppointmentCommandHandler(IApplicationDbContext context)
+        public CancelAppointmentCommandHandler(IApplicationDbContext context , ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Unit> Handle(CancelAppointmentCommand request , CancellationToken cancellationToken)
@@ -44,6 +47,8 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.CancelAppoi
             appointment.AvailabilitySlot.IsBooked = false;
 
             await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogWarning($"Attempt to cancel completed appointment {appointment.Id}.");
 
             return Unit.Value;
 

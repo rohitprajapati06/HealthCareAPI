@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 
@@ -10,10 +11,12 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Update
     public class UpdateAvailabilitySlotCommandHandler : IRequestHandler<UpdateAvailabilitySlotCommand>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public UpdateAvailabilitySlotCommandHandler(IApplicationDbContext context)
+        public UpdateAvailabilitySlotCommandHandler(IApplicationDbContext context , ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Unit> Handle(UpdateAvailabilitySlotCommand request, CancellationToken cancellationToken)
@@ -60,6 +63,8 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Update
             slot.EndTime = request.EndTime;
 
             await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation($"Available slot has been updated {slot.Id}");
 
             return Unit.Value;
         }

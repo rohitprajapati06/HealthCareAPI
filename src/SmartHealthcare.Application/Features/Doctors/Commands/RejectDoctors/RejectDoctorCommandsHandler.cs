@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Enums;
@@ -11,10 +12,12 @@ namespace SmartHealthcare.Application.Features.Doctors.Commands.RejectDoctors
     public class RejectDoctorCommandsHandler : IRequestHandler<RejectDoctorCommands,Guid>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public RejectDoctorCommandsHandler(IApplicationDbContext context)
+        public RejectDoctorCommandsHandler(IApplicationDbContext context , ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Guid> Handle (RejectDoctorCommands request , CancellationToken cancellationToken)
@@ -29,6 +32,8 @@ namespace SmartHealthcare.Application.Features.Doctors.Commands.RejectDoctors
             doctors.ApprovalStatus = DoctorApprovalStatus.Rejected;
 
             await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation($"Doctor Rejected {doctors.Id}");
 
             return doctors.Id;
         }

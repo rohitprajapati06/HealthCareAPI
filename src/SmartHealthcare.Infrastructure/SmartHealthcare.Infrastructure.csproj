@@ -13,10 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Storage\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\SmartHealthcare.Application\SmartHealthcare.Application.csproj" />
   </ItemGroup>
 

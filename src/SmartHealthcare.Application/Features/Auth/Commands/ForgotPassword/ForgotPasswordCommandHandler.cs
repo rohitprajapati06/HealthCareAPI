@@ -3,6 +3,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Contracts.Services;
 using SmartHealthcare.Domain.Entities;
 using System.Text;
@@ -12,11 +13,13 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.ForgotPassword
     public class ForgotPasswordCommandHandler:IRequestHandler<ForgotPasswordCommand,bool>
     {
         private readonly IEmailService emailService;
+        private readonly ILogger logger;
         private readonly UserManager<ApplicationUser> userManager;
 
-        public ForgotPasswordCommandHandler(UserManager<ApplicationUser> userManager , IEmailService emailService)
+        public ForgotPasswordCommandHandler(UserManager<ApplicationUser> userManager , IEmailService emailService , ILogger logger)
         {
             this.emailService = emailService;
+            this.logger = logger;
             this.userManager = userManager;
         }
 
@@ -44,6 +47,8 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.ForgotPassword
                         """;
 
             await emailService.SendEmailAsync(user.Email! ,"Password Reset", resetLink);
+
+            logger.LogInformation($"Password reset link has been invoked and send via mail {request.Email}");
 
             return true;
                 

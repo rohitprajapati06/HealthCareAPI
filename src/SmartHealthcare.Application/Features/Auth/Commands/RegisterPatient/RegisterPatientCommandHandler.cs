@@ -29,8 +29,8 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient
 
             if(existingUser != null)
             {
+                logger.LogWarning($"Failed login attempt for Email {request.Email} ");
                 throw new ConflictException("Email Already Exists");
-
             }
 
             var user = new ApplicationUser

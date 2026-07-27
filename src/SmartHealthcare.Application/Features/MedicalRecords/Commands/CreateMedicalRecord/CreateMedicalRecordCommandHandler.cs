@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Entities;
@@ -11,10 +12,12 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
     public class CreateMedicalRecordCommandHandler : IRequestHandler<CreateMedicalRecordCommand,Guid>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public CreateMedicalRecordCommandHandler(IApplicationDbContext context)
+        public CreateMedicalRecordCommandHandler(IApplicationDbContext context , ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Guid> Handle(CreateMedicalRecordCommand request , CancellationToken cancellationToken)
@@ -42,6 +45,8 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
             };
             await context.MedicalRecords.AddAsync(medicalrecord);
             await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation($"Medical Record Created - {request.Id}");
 
             return request.Id;
         }

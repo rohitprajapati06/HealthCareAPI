@@ -16,8 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Models\" />
-    <Folder Include="Common\Behaviors\" />
     <Folder Include="Common\Responses\" />
     <Folder Include="Contracts\Infrastructure\" />
     <Folder Include="Features\Auth\Mapping\" />

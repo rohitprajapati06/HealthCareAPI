@@ -2,8 +2,10 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
+using SmartHealthcare.Domain.Entities;
 using SmartHealthcare.Domain.Enums;
 
 namespace SmartHealthcare.Application.Features.Appointments.Commands.RescheduleAppointment
@@ -11,10 +13,12 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.RescheduleA
     public class RescheduleAppointmentCommandHandler : IRequestHandler<RescheduleAppointmentCommand , Unit>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public RescheduleAppointmentCommandHandler(IApplicationDbContext context)
+        public RescheduleAppointmentCommandHandler(IApplicationDbContext context,ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Unit> Handle(RescheduleAppointmentCommand request , CancellationToken cancellationToken) 
@@ -71,6 +75,8 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.RescheduleA
             appointments.AppointmentDate = newSlot.Date.ToDateTime(newSlot.StartTime);
 
             await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation($"Appointment rescheduled - {appointments.Id}");
 
             return Unit.Value;
 

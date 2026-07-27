@@ -15,9 +15,11 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog();
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
 
-Log.Logger = new LoggerConfiguration().WriteTo.Console().WriteTo.File("Logs/log-.txt",rollingInterval:RollingInterval.Day).CreateLogger();
+builder.Host.UseSerilog();
 
 // Add Controllers
 builder.Services.AddControllers();
@@ -131,6 +133,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
+app.UseSerilogRequestLogging();
+
 app.UseGlobalExceptionMidddleware();
 
 app.UseAuthentication();
@@ -148,6 +154,15 @@ using (var scope = app.Services.CreateScope())
     await SuperAdminSeeder.SuperAdminSeederAsync(services);
 }
 
-Log.Information("SmartHealth Care API Started Successfully");
+try{
+    Log.Information("SmartHealth Care API Started Successfully");
 
-app.Run();
+    app.Run();
+}catch(Exception ex)
+{
+    Log.Fatal(ex,"Applivation termminated Unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

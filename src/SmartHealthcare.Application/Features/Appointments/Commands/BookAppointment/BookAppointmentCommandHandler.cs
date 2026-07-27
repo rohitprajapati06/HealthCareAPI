@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Entities;
@@ -12,10 +13,12 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.BookAppoint
     public class BookAppointmentCommandHandler : IRequestHandler<BookAppointmentCommand, Guid>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public BookAppointmentCommandHandler(IApplicationDbContext context)
+        public BookAppointmentCommandHandler(IApplicationDbContext context , ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Guid> Handle(BookAppointmentCommand request , CancellationToken cancellationToken)
@@ -74,6 +77,8 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.BookAppoint
             slot.IsBooked = true;
 
             await context.SaveChangesAsync();
+
+            logger.LogInformation($"Appointment {appointment.Id} booked.");
 
             return appointment.Id;
         }

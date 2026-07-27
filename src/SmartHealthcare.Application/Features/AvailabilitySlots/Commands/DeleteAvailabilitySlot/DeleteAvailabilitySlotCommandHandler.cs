@@ -1,6 +1,7 @@
 ﻿
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using System.Runtime.CompilerServices;
@@ -10,10 +11,12 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Delete
     public class DeleteAvailabilitySlotCommandHandler : IRequestHandler<DeleteAvailabilitySlotCommand>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public DeleteAvailabilitySlotCommandHandler(IApplicationDbContext context)
+        public DeleteAvailabilitySlotCommandHandler(IApplicationDbContext context ,ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Unit> Handle(DeleteAvailabilitySlotCommand request , CancellationToken cancellationToken)
@@ -37,6 +40,8 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Delete
 
              context.AvailabilitySlots.Remove(slotId);
             await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation($"Available slot has been deleted");
 
             return Unit.Value;
 

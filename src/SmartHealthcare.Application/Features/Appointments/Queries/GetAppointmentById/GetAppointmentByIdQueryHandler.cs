@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Appointments.Responses;
 
@@ -10,11 +11,14 @@ namespace SmartHealthcare.Application.Features.Appointments.Queries.GetAppointme
     public class GetAppointmentByIdQueryHandler : IRequestHandler<GetAppointmentByIdQuery,AppointmentResponse>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public GetAppointmentByIdQueryHandler(IApplicationDbContext context)
+        public GetAppointmentByIdQueryHandler(IApplicationDbContext context , ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
+
 
         public async Task<AppointmentResponse> Handle(GetAppointmentByIdQuery request , CancellationToken cancellationToken)
         {
@@ -43,7 +47,7 @@ namespace SmartHealthcare.Application.Features.Appointments.Queries.GetAppointme
                 AvailabilitySlotId = appointments.AvailabilitySlotId,
                 Notes = appointments.Notes,
                 Status = appointments.Status.ToString(),
-
+                
             };
         } 
     }

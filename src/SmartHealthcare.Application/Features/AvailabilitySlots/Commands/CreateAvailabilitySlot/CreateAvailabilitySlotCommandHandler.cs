@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Entities;
@@ -13,10 +14,12 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Create
     public class CreateAvailabilitySlotCommandHandler:IRequestHandler<CreateAvailabilitySlot,Guid>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public CreateAvailabilitySlotCommandHandler(IApplicationDbContext context)
+        public CreateAvailabilitySlotCommandHandler(IApplicationDbContext context , ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Guid> Handle(CreateAvailabilitySlot request , CancellationToken cancellationToken)
@@ -48,7 +51,9 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Create
 
             if (overlap)
             {
+                logger.LogError("Slot has been overlap");
                 throw new ConflictException("Overlapping exists with the existing slot ");
+                
             }
 
             var slot = new AvailabilitySlot
@@ -63,6 +68,8 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Create
                     
              await context.AvailabilitySlots.AddAsync(slot);
              await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation($"Available Slot created - {slot.Id}");
 
             return slot.Id; 
             

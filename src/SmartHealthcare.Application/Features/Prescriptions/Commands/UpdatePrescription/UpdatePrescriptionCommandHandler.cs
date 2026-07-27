@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 
@@ -9,10 +10,12 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Commands.UpdatePres
     public class UpdatePrescriptionCommandHandler : IRequestHandler<UpdatePrescriptionCommand,Unit>
     {
         private readonly IApplicationDbContext context;
+        private readonly ILogger logger;
 
-        public UpdatePrescriptionCommandHandler(IApplicationDbContext context)
+        public UpdatePrescriptionCommandHandler(IApplicationDbContext context , ILogger logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<Unit> Handle (UpdatePrescriptionCommand request , CancellationToken cancellationToken)
@@ -28,6 +31,8 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Commands.UpdatePres
             prescriptions.Medication = request.Medication;
 
             await context.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation($"Prescription Updated - {request.PrescriptionId}");
 
             return Unit.Value;
 
