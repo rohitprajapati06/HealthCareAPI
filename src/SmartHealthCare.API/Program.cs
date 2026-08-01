@@ -24,6 +24,9 @@ builder.Host.UseSerilog();
 // Add Controllers
 builder.Services.AddControllers();
 
+builder.Services.AddSingleton<Microsoft.Extensions.Logging.ILogger>(servicepovider => 
+servicepovider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>().CreateLogger("SmartHealthCare"));
+
 builder.Services.AddApplication();
 
 builder.Services.AddInfrastucture(builder.Configuration);

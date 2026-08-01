@@ -29,18 +29,18 @@ namespace SmartHealthcare.Application.Features.Dashboard.Queries.GetPatientDashb
 
             var response = new PatientDashboardResponse
             {
-                upcomingAppointment = await context.Appointments.CountAsync(x => x.Id == request.PatientId
+                upcomingAppointment = await context.Appointments.CountAsync(x => x.PatientId == request.PatientId
                         && x.Status == AppointmentStatus.Confirmed, cancellationToken),
 
-                completedAppointment = await context.Appointments.CountAsync(x => x.Id == request.PatientId
+                completedAppointment = await context.Appointments.CountAsync(x => x.PatientId == request.PatientId
                         && x.Status == AppointmentStatus.Completed, cancellationToken),
 
-                cancelledAppointment = await context.Appointments.CountAsync(x => x.Id == request.PatientId
+                cancelledAppointment = await context.Appointments.CountAsync(x => x.PatientId == request.PatientId
                         && x.Status == AppointmentStatus.Cancelled, cancellationToken),
 
-                medicalRecords = await context.MedicalRecords.CountAsync(x => x.Id == request.PatientId,cancellationToken),
+                medicalRecords = await context.MedicalRecords.CountAsync(x => x.PatientId == request.PatientId,cancellationToken),
 
-                Prescriptions = await context.Prescriptions.CountAsync( x=> x.Id == request.PatientId,cancellationToken)
+                Prescriptions = await context.Prescriptions.CountAsync( x=> x.Appointment.PatientId == request.PatientId,cancellationToken)
             };
 
             return response;

@@ -8,8 +8,8 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
         {
             RuleFor(x => x.Id).NotEmpty();
             RuleFor(x => x.HospitalId).NotEmpty();
-            RuleFor(x => x.FileName).NotEmpty().MaximumLength(255);
-            RuleFor(x => x.FileUrl).NotEmpty();
+            RuleFor(x => x.File.Length).GreaterThan(0);
+            RuleFor(x => x.File).NotNull();
             RuleFor(x => x.RecordType).NotEmpty().MaximumLength(100);
 
         }

@@ -21,7 +21,7 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Queries.GetPatientP
             return await context.Prescriptions
                 .Include(p => p.DoctorProfile).ThenInclude(u => u.User)
                 .Include(a => a.Appointment)
-                .Where(x => x.Id == request.PatientId)
+                .Where(x => x.Appointment.PatientId == request.PatientId)
                 .Select(x => new PrescriptionsResponses
                 {
                     Id = x.Id,

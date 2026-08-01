@@ -2,10 +2,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SmartHealthcare.Application.Features.Appointments.Queries.GetPatientAppointments;
 using SmartHealthcare.Application.Features.Prescriptions.Commands.CreatePrescription;
 using SmartHealthcare.Application.Features.Prescriptions.Commands.UpdatePrescription;
 using SmartHealthcare.Application.Features.Prescriptions.Queries.GetDoctorPrescriptions;
+using SmartHealthcare.Application.Features.Prescriptions.Queries.GetPatientPrescriptions;
 using SmartHealthcare.Application.Features.Prescriptions.Queries.GetPrescriptionById;
 using SmartHealthcare.Application.Features.Prescriptions.Responses;
 
@@ -39,10 +39,10 @@ namespace SmartHealthCare.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("patient/{PatientId}")]
-        public async Task<ActionResult<PrescriptionsResponses>> GetPatientPrescription([FromQuery]Guid PatientId)
+        [HttpGet("patient/{patientId}")]
+        public async Task<ActionResult<PrescriptionsResponses>> GetPatientPrescription([FromQuery]Guid patientId)
         {
-            var result = await mediator.Send(new GetPatientAppointmentsQuery(PatientId));
+            var result = await mediator.Send(new GetPatientPrescriptionsQuery(patientId));
             return Ok(result);
         }
 

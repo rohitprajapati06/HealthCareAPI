@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SmartHealthcare.Application.Features.Appointments.Queries.GetPatientAppointments;
 using SmartHealthcare.Application.Features.Dashboard.Queries.GetAdminDashboard;
 using SmartHealthcare.Application.Features.Dashboard.Queries.GetDoctorDashboard;
+using SmartHealthcare.Application.Features.Dashboard.Queries.GetPatientDashboard;
 
 namespace SmartHealthCare.API.Controllers
 {
@@ -31,10 +31,10 @@ namespace SmartHealthCare.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("DoctorDashboard/{PatientId}")]
-        public async Task<IActionResult> PatientDashboard(Guid PatientId)
+        [HttpGet("PatientDashboard/{patientId}")]
+        public async Task<IActionResult> PatientDashboard(Guid patientId)
         {
-            var result = await mediator.Send(new GetPatientAppointmentsQuery(PatientId));
+            var result = await mediator.Send(new GetPatientDashboardQuery(patientId));
             return Ok(result);
         }
     }

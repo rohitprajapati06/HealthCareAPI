@@ -3,6 +3,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Appointments.Responses;
 
@@ -31,7 +32,7 @@ namespace SmartHealthcare.Application.Features.Appointments.Queries.GetAppointme
 
             if(appointments == null)
             {
-                throw new Exception("Appointment not found");
+                throw new NotFoundException("Appointment not found");
             }
 
             return new AppointmentResponse
