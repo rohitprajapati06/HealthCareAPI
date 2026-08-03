@@ -84,13 +84,12 @@ namespace SmartHealthCare.API.Controllers
         }
 
         [HttpPut("{appointmentId}/reschedule")]
-        public async Task<IActionResult> RescheduleAppointment(Guid appointmentId)
+        public async Task<IActionResult> RescheduleAppointment(Guid appointmentId , [FromBody] RescheduleAppointmentCommand command)
         {
-            await mediator.Send(new RescheduleAppointmentCommand
-            {
-                AppointmentId= appointmentId
-            });
 
+            command.AppointmentId = appointmentId;
+            await mediator.Send(command);
+           
             return NoContent();
             
         }

@@ -6,7 +6,6 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
     {
         public CreateMedicalRecordCommandValidator()
         {
-            RuleFor(x => x.Id).NotEmpty();
             RuleFor(x => x.HospitalId).NotEmpty();
             RuleFor(x => x.File.Length).GreaterThan(0);
             RuleFor(x => x.File).NotNull();

@@ -29,7 +29,8 @@ namespace SmartHealthcare.Application.Features.Dashboard.Queries.GetAdminDashboa
              totalPatients = await context.PatientProfiles.CountAsync(cancellationToken),
              totalAppointments = await context.Appointments.CountAsync(cancellationToken),
              completedAppointments = await context.Appointments.CountAsync(x => x.Status == AppointmentStatus.Completed),
-             pendingAppoinments = await context.Appointments.CountAsync(x => x.Status == AppointmentStatus.Pending),
+             pendingAppointments = await context.Appointments.CountAsync(x => x.Status == AppointmentStatus.Pending),
+             cancelledAppointments = await context.Appointments.CountAsync(x => x.Status == AppointmentStatus.Cancelled),
              totalPrescriptions = await context.Prescriptions.CountAsync(cancellationToken),
              totalMedicalRecords = await context.MedicalRecords.CountAsync(cancellationToken)
 

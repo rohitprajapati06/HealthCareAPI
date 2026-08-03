@@ -31,7 +31,8 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Queries.GetPrescrip
 
             return new PrescriptionsResponses
             {
-                AppointmentId = request.PrescriptionId,
+                Id = prescription.Id,
+                AppointmentId = prescription.AppointmentId,
                 DoctorId = prescription.DoctorId,
                 DoctorName = prescription.DoctorProfile.User.FirstName + " " + prescription.DoctorProfile.User.LastName,
                 Instructions = prescription.Instructions,

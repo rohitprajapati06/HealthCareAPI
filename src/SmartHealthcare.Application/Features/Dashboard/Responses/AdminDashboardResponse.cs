@@ -20,7 +20,9 @@ namespace SmartHealthcare.Application.Features.Dashboard.Responses
 
         public int completedAppointments { get; set; }
 
-        public int pendingAppoinments { get; set; }
+        public int pendingAppointments { get; set; }
+
+        public int cancelledAppointments { get; set; }
 
         public int totalPrescriptions { get; set; }
 

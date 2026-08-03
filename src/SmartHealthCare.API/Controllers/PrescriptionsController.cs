@@ -40,7 +40,7 @@ namespace SmartHealthCare.API.Controllers
         }
 
         [HttpGet("patient/{patientId}")]
-        public async Task<ActionResult<PrescriptionsResponses>> GetPatientPrescription([FromQuery]Guid patientId)
+        public async Task<ActionResult<PrescriptionsResponses>> GetPatientPrescription(Guid patientId)
         {
             var result = await mediator.Send(new GetPatientPrescriptionsQuery(patientId));
             return Ok(result);

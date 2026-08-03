@@ -5,7 +5,7 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
 {
     public class CreateMedicalRecordCommand : IRequest<Guid>
     {
-        public Guid Id { get; set; }
+        public Guid PatientId { get; set; }
 
         public Guid HospitalId { get; set; }
 

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
-using SmartHealthcare.Application.Features.Prescriptions.Responses;
 using SmartHealthcare.Domain.Entities;
 using SmartHealthcare.Domain.Enums;
 
@@ -53,6 +52,7 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Commands.CreatePres
                 DoctorId = request.DoctorId,
                 Medication = request.Medication,
                 Instructions = request.Instructions,
+                CreatedAt = DateTime.UtcNow
             };
 
            await context.Prescriptions.AddAsync(prescription);

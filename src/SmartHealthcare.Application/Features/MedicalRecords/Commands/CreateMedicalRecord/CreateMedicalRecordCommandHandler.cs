@@ -25,7 +25,7 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
 
         public async Task<Guid> Handle(CreateMedicalRecordCommand request , CancellationToken cancellationToken)
         {
-            var patient = await context.PatientProfiles.FirstOrDefaultAsync(x => x.Id == request.Id,cancellationToken);
+            var patient = await context.PatientProfiles.FirstOrDefaultAsync(x => x.Id == request.PatientId,cancellationToken);
 
             if(patient == null) {
                 throw new NotFoundException("Patient not found");
@@ -42,7 +42,8 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
 
             var medicalrecord = new MedicalRecord
             {
-                Id = request.Id,
+                Id = Guid.NewGuid(),
+                PatientId = request.PatientId,
                 HospitalId = request.HospitalId,
                 FileName = uploadResult.FileName,
                 FileUrl = uploadResult.FileURL,
@@ -51,9 +52,12 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
             await context.MedicalRecords.AddAsync(medicalrecord);
             await context.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation($"Medical Record Created - {request.Id}");
+            logger.LogInformation(
+                "Medical record {MedicalRecordId} created for patient {PatientId}",
+                medicalrecord.Id,
+                request.PatientId);
 
-            return request.Id;
+            return medicalrecord.Id;
         }
     }
 }

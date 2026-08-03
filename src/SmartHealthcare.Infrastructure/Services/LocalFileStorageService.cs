@@ -29,7 +29,7 @@ namespace SmartHealthcare.Infrastructure.Services
 
             var extension = Path.GetExtension(file.FileName);
             
-            if(options.AllowedExtensions.Contains(extension , StringComparer.OrdinalIgnoreCase))
+            if(!options.AllowedExtensions.Contains(extension , StringComparer.OrdinalIgnoreCase))
             {
                 throw new BadRequestException("File Type is Not Allowed");
             }
@@ -41,7 +41,7 @@ namespace SmartHealthcare.Infrastructure.Services
                 throw new BadRequestException($"Maximum File Size in {options.MaxFileSizeinMb} Mb");
             }
 
-            var folderPath = Path.Combine(environment.WebRootPath, options.RootFolder, folderName);
+            var folderPath = Path.Combine(environment.ContentRootPath, options.RootFolder, folderName);
             Directory.CreateDirectory(folderPath);
 
             var fileName = $"{Guid.NewGuid()}{extension}";
@@ -61,7 +61,7 @@ namespace SmartHealthcare.Infrastructure.Services
 
         public Task DeleteAsync(string filePath, CancellationToken cancellationToken = default)
         {
-            var physicalPath = Path.Combine(environment.WebRootPath, filePath.TrimStart('/'));
+            var physicalPath = Path.Combine(environment.ContentRootPath, filePath.TrimStart('/'));
 
 
             if (File.Exists(physicalPath))
