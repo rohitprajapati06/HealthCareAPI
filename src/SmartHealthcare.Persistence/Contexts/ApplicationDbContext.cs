@@ -4,148 +4,52 @@ using Microsoft.EntityFrameworkCore;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Entities;
 
-
-namespace SmartHealthcare.Persistence.Contexts
+public class ApplicationDbContext
+    : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>,
+      IApplicationDbContext
 {
-    public class ApplicationDbContext:IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>,IApplicationDbContext
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options): base(options)
-        {
-            
-        }
+    }
 
-        public DbSet<Hospital> Hospitals { get; set; }
+    public DbSet<Hospital> Hospitals { get; set; }
 
-        public DbSet<DoctorProfile> DoctorProfiles { get; set; } 
+    public DbSet<DoctorProfile> DoctorProfiles { get; set; }
 
-        public DbSet<PatientProfile> PatientProfiles { get; set; }
+    public DbSet<PatientProfile> PatientProfiles { get; set; }
 
-        public DbSet<Appointment> Appointments { get; set; }
+    public DbSet<Appointment> Appointments { get; set; }
 
-        public DbSet<Prescription> Prescriptions { get; set; }
+    public DbSet<Prescription> Prescriptions { get; set; }
 
-        public DbSet<MedicalRecord> MedicalRecords { get; set; }
+    public DbSet<MedicalRecord> MedicalRecords { get; set; }
 
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
-        public DbSet<AvailabilitySlot> AvailabilitySlots { get; set; }
+    public DbSet<AvailabilitySlot> AvailabilitySlots { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
 
-            builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
-            ConfigureIdentityTables(builder);
+        ConfigureIdentityTables(builder);
+    }
 
-            ConfigureRelationships(builder);
-        }
+    private static void ConfigureIdentityTables(ModelBuilder builder)
+    {
+        builder.Entity<IdentityRole<Guid>>().ToTable("Roles");
 
-        private void ConfigureRelationships(ModelBuilder builder)
-        {
-            builder.Entity<ApplicationUser>(entity =>
-            {
-                entity.ToTable("Users");
-            });
+        builder.Entity<IdentityUserRole<Guid>>().ToTable("UserRoles");
 
-            builder.Entity<IdentityRole<Guid>>(entity =>
-            {
-                entity.ToTable("Roles");
-            });
-            builder.Entity<IdentityUserRole<Guid>>(entity =>
-            {
-                entity.ToTable("UserRoles");
-            });
+        builder.Entity<IdentityUserClaim<Guid>>().ToTable("UserClaims");
 
-            builder.Entity<IdentityUserClaim<Guid>>(entity =>
-            {
-                entity.ToTable("UserClaims");
-            });
+        builder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogins");
 
-            builder.Entity<IdentityUserLogin<Guid>>(entity =>
-            {
-                entity.ToTable("UserLogins");
-            });
+        builder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
 
-            builder.Entity<IdentityRoleClaim<Guid>>(entity =>
-            {
-                entity.ToTable("RoleClaims");
-            });
-
-            builder.Entity<IdentityUserToken<Guid>>(entity =>
-            {
-                entity.ToTable("UserTokens");
-            });
-
-        }
-
-        private void ConfigureIdentityTables(ModelBuilder builder)
-        {
-            builder.Entity<DoctorProfile>()
-                .HasOne(d => d.User)
-                .WithOne(u => u.DoctorProfile)
-                .HasForeignKey<DoctorProfile>(d => d.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<PatientProfile>()
-                .HasOne(p => p.User)
-                .WithOne(u => u.PatientProfile)
-                .HasForeignKey<PatientProfile>(p => p.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<RefreshToken>()
-            .HasOne(r => r.User)
-            .WithMany(u => u.RefreshTokens)
-            .HasForeignKey(r => r.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-            builder.Entity<Appointment>()
-                .HasOne(a => a.Patient)
-                .WithMany(p => p.Appointments)
-                .HasForeignKey(a => a.PatientId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<Appointment>()
-                .HasOne(a => a.Doctor)
-                .WithMany(d => d.Appointments)
-                .HasForeignKey(a => a.DoctorId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<Appointment>()
-                .HasOne(a => a.Hospital)
-                .WithMany(h => h.Appointments)
-                .HasForeignKey(a => a.HospitalId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<Appointment>()
-                .HasOne(a => a.AvailabilitySlot)
-                .WithMany(s => s.Appointments)
-                .HasForeignKey(a => a.AvailabilitySlotId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<Prescription>()
-                .HasOne(p => p.Appointment)
-                .WithOne(a => a.Prescription)
-                .HasForeignKey<Prescription>(p => p.AppointmentId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.Entity<Prescription>()
-                .HasOne(p => p.DoctorProfile)
-                .WithMany(d => d.Prescriptions)
-                .HasForeignKey(p => p.DoctorId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<MedicalRecord>()
-                .HasOne(m => m.Patient)
-                .WithMany(p => p.MedicalRecords)
-                .HasForeignKey(m => m.PatientId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<AvailabilitySlot>()
-                .HasOne(a => a.Doctor)
-                .WithMany(d => d.AvailabilitySlots)
-                .HasForeignKey(a => a.DoctorId)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
+        builder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
     }
 }
