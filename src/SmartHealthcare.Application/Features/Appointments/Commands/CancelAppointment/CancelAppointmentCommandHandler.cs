@@ -13,9 +13,9 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.CancelAppoi
     public class CancelAppointmentCommandHandler : IRequestHandler<CancelAppointmentCommand,Unit>
     {
         private readonly IApplicationDbContext context;
-        private readonly ILogger logger;
+        private readonly ILogger<CancelAppointmentCommandHandler> logger;
 
-        public CancelAppointmentCommandHandler(IApplicationDbContext context , ILogger logger)
+        public CancelAppointmentCommandHandler(IApplicationDbContext context , ILogger<CancelAppointmentCommandHandler> logger)
         {
             this.context = context;
             this.logger = logger;
@@ -23,9 +23,7 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.CancelAppoi
 
         public async Task<Unit> Handle(CancelAppointmentCommand request , CancellationToken cancellationToken)
         {
-            var appointment = await context.Appointments
-                .Include(x => x.AvailabilitySlot)
-                .FirstOrDefaultAsync(x => x.Id == request.AppointmentId);
+            var appointment = await context.Appointments.FirstOrDefaultAsync(x => x.Id == request.AppointmentId,cancellationToken);
 
             if(appointment == null)
             {
@@ -39,16 +37,23 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.CancelAppoi
 
             if(appointment.Status == AppointmentStatus.Completed)
             {
-                throw new BadRequestException("Appointment is already completed");
+                throw new BadRequestException("Completed appointments cannot be cancelled.");
+            }
+
+            var slot = await context.AvailabilitySlots.FirstOrDefaultAsync(x => x.Id == appointment.AvailabilitySlotId,cancellationToken);
+
+            if (slot == null)
+            {
+                throw new NotFoundException("Availability slot not found.");
             }
 
             appointment.Status = AppointmentStatus.Cancelled;
 
-            appointment.AvailabilitySlot.IsBooked = false;
+            slot.IsBooked = false;
 
             await context.SaveChangesAsync(cancellationToken);
 
-            logger.LogWarning($"Attempt to cancel completed appointment {appointment.Id}.");
+            logger.LogWarning("Appointment {AppointmentId} cancelled successfully.",appointment.Id);
 
             return Unit.Value;
 

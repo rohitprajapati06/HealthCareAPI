@@ -12,9 +12,9 @@ namespace SmartHealthcare.Application.Features.Doctors.Commands.RejectDoctors
     public class RejectDoctorCommandsHandler : IRequestHandler<RejectDoctorCommands,Guid>
     {
         private readonly IApplicationDbContext context;
-        private readonly ILogger logger;
+        private readonly ILogger<RejectDoctorCommandsHandler> logger;
 
-        public RejectDoctorCommandsHandler(IApplicationDbContext context , ILogger logger)
+        public RejectDoctorCommandsHandler(IApplicationDbContext context , ILogger<RejectDoctorCommandsHandler> logger)
         {
             this.context = context;
             this.logger = logger;
@@ -22,20 +22,27 @@ namespace SmartHealthcare.Application.Features.Doctors.Commands.RejectDoctors
 
         public async Task<Guid> Handle (RejectDoctorCommands request , CancellationToken cancellationToken)
         {
-            var doctors = await context.DoctorProfiles.FirstOrDefaultAsync(x => x.Id == request.DoctorId);
+            var doctor = await context.DoctorProfiles.FirstOrDefaultAsync(x => x.Id == request.DoctorId,cancellationToken);
 
-            if(doctors == null)
+            if(doctor == null)
             {
-                throw new NotFoundException("Doctor Not Found");
+                throw new NotFoundException("Doctor not found");
             }
 
-            doctors.ApprovalStatus = DoctorApprovalStatus.Rejected;
+            if (doctor.ApprovalStatus == DoctorApprovalStatus.Rejected)
+            {
+                throw new ConflictException("Doctor is already rejected.");
+            }
+
+            doctor.ApprovalStatus = DoctorApprovalStatus.Rejected;
 
             await context.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation($"Doctor Rejected {doctors.Id}");
+            logger.LogInformation(
+                "Doctor {DoctorId} rejected successfully.",
+                doctor.Id);
 
-            return doctors.Id;
+            return doctor.Id;
         }
     }
 }

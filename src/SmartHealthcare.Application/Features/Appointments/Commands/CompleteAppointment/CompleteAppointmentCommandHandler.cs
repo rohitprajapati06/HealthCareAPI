@@ -13,9 +13,9 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.CompleteApp
     public class CompleteAppointmentCommandHandler : IRequestHandler<CompleteAppointmentCommand,Unit>
     {
         private readonly IApplicationDbContext context;
-        private readonly ILogger logger;
+        private readonly ILogger<CompleteAppointmentCommandHandler> logger;
 
-        public CompleteAppointmentCommandHandler(IApplicationDbContext context , ILogger logger)
+        public CompleteAppointmentCommandHandler(IApplicationDbContext context , ILogger<CompleteAppointmentCommandHandler> logger)
         {
             this.context = context;
             this.logger = logger;
@@ -23,28 +23,33 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.CompleteApp
 
         public async Task<Unit> Handle (CompleteAppointmentCommand request , CancellationToken cancellationToken)
         {
-            var appointments = await context.Appointments.FirstOrDefaultAsync(x => x.Id == request.AppointmentId);
+            var appointment = await context.Appointments.FirstOrDefaultAsync(x => x.Id == request.AppointmentId,cancellationToken);
 
-            if(appointments == null)
+            if(appointment == null)
             {
                 throw new NotFoundException("Appointment not found");
             }
 
-            if(appointments.Status == AppointmentStatus.Cancelled)
+            if(appointment.Status == AppointmentStatus.Cancelled)
             {
                 throw new BadRequestException("Appointment is already cancelled");
             }
 
-            if(appointments.Status == AppointmentStatus.Completed)
+            if(appointment.Status == AppointmentStatus.Completed)
             {
                 throw new BadRequestException("Appointment is already completed");
             }
 
-            appointments.Status = AppointmentStatus.Completed;
+            if (appointment.AppointmentDate > DateTime.Now)
+            {
+                throw new BadRequestException("Future appointments cannot be completed.");
+            }
+
+            appointment.Status = AppointmentStatus.Completed;
 
             await context.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation($"Appointment {appointments.Id} completed.");
+            logger.LogInformation("Appointment {AppointmentId} completed successfully.",appointment.Id);
 
             return Unit.Value;
         }

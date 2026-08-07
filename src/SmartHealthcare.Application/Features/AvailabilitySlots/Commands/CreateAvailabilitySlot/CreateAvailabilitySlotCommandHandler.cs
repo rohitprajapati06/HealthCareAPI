@@ -14,9 +14,9 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Create
     public class CreateAvailabilitySlotCommandHandler:IRequestHandler<CreateAvailabilitySlot,Guid>
     {
         private readonly IApplicationDbContext context;
-        private readonly ILogger logger;
+        private readonly ILogger<CreateAvailabilitySlotCommandHandler> logger;
 
-        public CreateAvailabilitySlotCommandHandler(IApplicationDbContext context , ILogger logger)
+        public CreateAvailabilitySlotCommandHandler(IApplicationDbContext context , ILogger<CreateAvailabilitySlotCommandHandler> logger)
         {
             this.context = context;
             this.logger = logger;
@@ -24,26 +24,26 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Create
 
         public async Task<Guid> Handle(CreateAvailabilitySlot request , CancellationToken cancellationToken)
         {
-            var doctors = await context.DoctorProfiles.FirstOrDefaultAsync(x => x.Id == request.DoctorId,cancellationToken);
+            var doctor = await context.DoctorProfiles.FirstOrDefaultAsync(x => x.Id == request.DoctorId,cancellationToken);
 
-            if(doctors == null)
+            if(doctor == null)
             {
                 throw new NotFoundException("Doctor not found");
             }
 
-            if(doctors.ApprovalStatus != DoctorApprovalStatus.Approved)
+            if(doctor.ApprovalStatus != DoctorApprovalStatus.Approved)
             {
                 throw new ForbiddenException("Doctor is Not Approved");
             }
 
             if(request.Date < DateOnly.FromDateTime(DateTime.Today))
             {
-                throw new ConflictException("Cannot create slots for past dates.");
+                throw new BadRequestException("Cannot create slots for past dates.");
             }
 
             if(request.EndTime <= request.StartTime)
             {
-                throw new ConflictException("End time must be greater than start time");
+                throw new BadRequestException("End time must be greater than start time");
             }
 
             bool overlap = await context.AvailabilitySlots.AnyAsync(x => x.DoctorId == request.DoctorId && x.Date == request.Date &&
@@ -66,10 +66,14 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Create
 
             };
                     
-             await context.AvailabilitySlots.AddAsync(slot);
+             await context.AvailabilitySlots.AddAsync(slot,cancellationToken);
              await context.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation($"Available Slot created - {slot.Id}");
+            logger.LogInformation(
+                "Availability slot {SlotId} created for Doctor {DoctorId}.",
+                slot.Id,
+                slot.DoctorId);
+
 
             return slot.Id; 
             

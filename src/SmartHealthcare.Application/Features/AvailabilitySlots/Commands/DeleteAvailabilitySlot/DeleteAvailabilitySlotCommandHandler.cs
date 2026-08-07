@@ -11,9 +11,9 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Delete
     public class DeleteAvailabilitySlotCommandHandler : IRequestHandler<DeleteAvailabilitySlotCommand>
     {
         private readonly IApplicationDbContext context;
-        private readonly ILogger logger;
+        private readonly ILogger<DeleteAvailabilitySlotCommandHandler> logger;
 
-        public DeleteAvailabilitySlotCommandHandler(IApplicationDbContext context ,ILogger logger)
+        public DeleteAvailabilitySlotCommandHandler(IApplicationDbContext context ,ILogger<DeleteAvailabilitySlotCommandHandler> logger)
         {
             this.context = context;
             this.logger = logger;
@@ -21,27 +21,27 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Delete
 
         public async Task<Unit> Handle(DeleteAvailabilitySlotCommand request , CancellationToken cancellationToken)
         {
-            var slotId = await context.AvailabilitySlots.FirstOrDefaultAsync(x => x.Id == request.SlotId,cancellationToken);
+            var slot = await context.AvailabilitySlots.FirstOrDefaultAsync(x => x.Id == request.SlotId,cancellationToken);
 
-            if(slotId == null)
+            if(slot == null)
             {
-                throw new NotFoundException("There is no slot exist");
+                throw new NotFoundException("Availability slot not found.");
             }
 
-            if(slotId.DoctorId != request.DoctorId)
+            if(slot.DoctorId != request.DoctorId)
             {
-                throw new ConflictException("You cannot delete the other doctors appointment");
+                throw new ForbiddenException("You are not allowed to delete another doctor's availability slot.");
             }
 
-            if (slotId.IsBooked)
+            if (slot.IsBooked)
             {
-                throw new ConflictException("You cannot delete the booked slots");
+                throw new ConflictException("Booked availability slots cannot be deleted.");
             }
 
-             context.AvailabilitySlots.Remove(slotId);
+             context.AvailabilitySlots.Remove(slot);
             await context.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation($"Available slot has been deleted");
+            logger.LogInformation( "Availability slot {SlotId} deleted for Doctor {DoctorId}.",slot.Id,slot.DoctorId);
 
             return Unit.Value;
 

@@ -18,6 +18,7 @@ namespace SmartHealthcare.Application.Features.Hospitals.Queries.GetHospitals
         public async Task<List<HospitalResponse>> Handle(GetHospitalsQuery request , CancellationToken cancellationToken)
         {
             return await context.Hospitals
+                .AsNoTracking()
                 .Where(x => x.IsActive)
                 .Select(x => new HospitalResponse
                 {

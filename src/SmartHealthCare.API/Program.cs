@@ -7,7 +7,6 @@ using SmartHealthcare.Application.Common.Settings;
 using SmartHealthcare.Domain.Entities;
 using SmartHealthcare.Infrastructure;
 using SmartHealthcare.Persistence;
-using SmartHealthcare.Persistence.Contexts;
 using SmartHealthcare.Persistence.Seed;
 using SmartHealthCare.API.Extensions;
 using System.Text;

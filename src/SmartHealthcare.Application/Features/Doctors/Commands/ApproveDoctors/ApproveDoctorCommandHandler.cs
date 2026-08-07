@@ -13,9 +13,9 @@ namespace SmartHealthcare.Application.Features.Doctors.Commands.ApproveDoctors
     public class ApproveDoctorCommandHandler : IRequestHandler<ApproveDoctorCommand,Guid>
     {
         private readonly IApplicationDbContext context;
-        private readonly ILogger logger;
+        private readonly ILogger<ApproveDoctorCommandHandler> logger;
 
-        public ApproveDoctorCommandHandler(IApplicationDbContext context , ILogger logger)
+        public ApproveDoctorCommandHandler(IApplicationDbContext context , ILogger<ApproveDoctorCommandHandler> logger)
         {
             this.context = context;
             this.logger = logger;
@@ -23,20 +23,27 @@ namespace SmartHealthcare.Application.Features.Doctors.Commands.ApproveDoctors
 
         public async Task<Guid> Handle(ApproveDoctorCommand request ,CancellationToken cancellationToken)
         {
-            var doctors = await context.DoctorProfiles.FirstOrDefaultAsync(x => x.Id == request.DoctorId, cancellationToken);
+            var doctor = await context.DoctorProfiles.FirstOrDefaultAsync(x => x.Id == request.DoctorId, cancellationToken);
 
-            if(doctors == null)
+            if(doctor == null)
             {
                 throw new NotFoundException("Doctor Not Found");
             }
 
-             doctors.ApprovalStatus = DoctorApprovalStatus.Approved;
+            if (doctor.ApprovalStatus == DoctorApprovalStatus.Approved)
+            {
+                throw new ConflictException("Doctor is already approved.");
+            }
+
+            doctor.ApprovalStatus = DoctorApprovalStatus.Approved;
 
              await context.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation($"Doctor Approved - {doctors.Id}");
+            logger.LogInformation(
+                "Doctor {DoctorId} approved successfully.",
+                doctor.Id);
 
-            return doctors.Id;
+            return doctor.Id;
         }
     }
 }

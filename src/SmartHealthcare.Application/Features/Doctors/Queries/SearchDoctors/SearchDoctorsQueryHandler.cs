@@ -20,8 +20,7 @@ namespace SmartHealthcare.Application.Features.Doctors.Queries.SearchDoctors
         public async Task<List<DoctorResponse>> Handle(SearchDoctorsQuery request , CancellationToken cancellationToken)
         {
             var doctors =  context.DoctorProfiles
-               .Include(x => x.User)
-               .Include(x => x.Hospital)
+               .AsNoTracking()
                .Where(x => x.ApprovalStatus == DoctorApprovalStatus.Approved)
                .AsQueryable();
 
@@ -37,7 +36,7 @@ namespace SmartHealthcare.Application.Features.Doctors.Queries.SearchDoctors
 
             if (request.Experience.HasValue)
             {
-                doctors = doctors.Where(x => x.ExperienceYears == request.Experience);
+                doctors = doctors.Where(x => x.ExperienceYears >= request.Experience);
             }
 
             if (request.MinFee.HasValue)
@@ -51,6 +50,7 @@ namespace SmartHealthcare.Application.Features.Doctors.Queries.SearchDoctors
             }
 
             return await doctors
+                .OrderBy(x => x.User.FirstName)
                 .Select(x => new DoctorResponse
                 {
                     Id = x.Id,

@@ -18,7 +18,8 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Queries.GetAvai
         public async Task<List<AvailabilitySlotResponse>> Handle(GetAvailableSlotQuery request , CancellationToken cancellationToken)
         {
              return await context.AvailabilitySlots
-                .Where(x => x.DoctorId == request.DoctorId)
+                .AsNoTracking()
+                .Where(x => x.DoctorId == request.DoctorId && !x.IsBooked)
                 .OrderBy(x => x.Date)
                 .ThenBy(x => x.StartTime)
                 .Select(x => new AvailabilitySlotResponse

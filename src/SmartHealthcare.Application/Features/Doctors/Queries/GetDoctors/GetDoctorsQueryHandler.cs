@@ -20,8 +20,7 @@ namespace SmartHealthcare.Application.Features.Doctors.Queries.GetDoctors
         public async Task<List<DoctorResponse>> Handle(GetDoctorsQuery request , CancellationToken cancellationToken)
         {
             return await context.DoctorProfiles
-                .Include(x => x.User)
-                .Include(x => x.Hospital)
+                .AsNoTracking()
                 .Where(x => x.ApprovalStatus == DoctorApprovalStatus.Approved)
                 .Select(x => new DoctorResponse
                 {

@@ -19,23 +19,26 @@ namespace SmartHealthcare.Application.Features.Hospitals.Queries.GetHospitalById
 
         public async Task<HospitalResponse> Handle(GetHospitalByIdQuery request , CancellationToken cancellationToken)
         {
-            var hospital = await context.Hospitals.Where(x => x.IsActive).FirstOrDefaultAsync(x => x.Id == request.Id);
+            var hospital = await context.Hospitals
+                .AsNoTracking()
+                .Where(x => x.IsActive && x.Id == request.Id)
+                .Select(x => new HospitalResponse
+                {
+                    Id = x.Id,
+                    RohiniCode = x.RohiniCode,
+                    Name = x.Name,
+                    City = x.City,
+                    Address = x.Address,
+                    State = x.State,
+                    Country = x.Country,
+                }).FirstOrDefaultAsync(cancellationToken);
 
-            if (hospital == null) {
-                throw new NotFoundException("Hospital not found");
+            if (hospital == null)
+            {
+                throw new NotFoundException("Hospital not found.");
             }
 
-            return new HospitalResponse
-            {
-                 Id = hospital.Id,
-                 RohiniCode =  hospital.RohiniCode,
-                 Name = hospital.Name,
-                 Address = hospital.Address,
-                 City = hospital.City,
-                 State = hospital.State,
-                 Country = hospital.Country,
-                 
-            };
+            return hospital;
         }
     }
 }

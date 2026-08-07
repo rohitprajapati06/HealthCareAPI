@@ -12,44 +12,40 @@ namespace SmartHealthcare.Application.Features.Appointments.Queries.GetAppointme
     public class GetAppointmentByIdQueryHandler : IRequestHandler<GetAppointmentByIdQuery,AppointmentResponse>
     {
         private readonly IApplicationDbContext context;
-        private readonly ILogger logger;
 
-        public GetAppointmentByIdQueryHandler(IApplicationDbContext context , ILogger logger)
+        public GetAppointmentByIdQueryHandler(IApplicationDbContext context)
         {
             this.context = context;
-            this.logger = logger;
+            
         }
 
 
         public async Task<AppointmentResponse> Handle(GetAppointmentByIdQuery request , CancellationToken cancellationToken)
         {
-            var appointments = await context.Appointments
-                .Include(x => x.Doctor).ThenInclude(u => u.User)
-                .Include(x => x.Patient).ThenInclude(u => u.User)
-                .Include(x => x.Hospital)
-                .Include(x => x.AvailabilitySlot)
-                .FirstOrDefaultAsync(x => x.Id == request.AppointmentId , cancellationToken);
+            var appointment = await context.Appointments
+                .AsNoTracking()
+                 .Where(x => x.Id == request.AppointmentId)
+                 .Select(x => new AppointmentResponse
+                 {
+                     Id = x.Id,
+                     DoctorId = x.DoctorId,
+                     DoctorName = x.Doctor.User.FirstName + " " + x.Doctor.User.LastName,
+                     PatientId = x.PatientId,
+                     PatientName = x.Patient.User.FirstName + " " + x.Patient.User.LastName,
+                     HospitalId = x.HospitalId,
+                     HospitalName = x.Hospital.Name,
+                     AppointmentDate = x.AppointmentDate,
+                     AvailabilitySlotId = x.AvailabilitySlotId,
+                     Notes = x.Notes,
+                     Status = x.Status.ToString()
+                 }).FirstOrDefaultAsync(cancellationToken);
 
-            if(appointments == null)
+            if(appointment == null)
             {
                 throw new NotFoundException("Appointment not found");
             }
 
-            return new AppointmentResponse
-            {
-                Id = appointments.Id,
-                DoctorId = appointments.DoctorId,
-                DoctorName = $"{appointments.Doctor.User.FirstName} {appointments.Doctor.User.LastName}",
-                PatientId = appointments.PatientId,
-                PatientName = $"{appointments.Patient.User.FirstName} {appointments.Patient.User.LastName}",
-                HospitalId = appointments.HospitalId,
-                HospitalName = appointments.Hospital.Name,
-                AppointmentDate = appointments.AppointmentDate,
-                AvailabilitySlotId = appointments.AvailabilitySlotId,
-                Notes = appointments.Notes,
-                Status = appointments.Status.ToString(),
-                
-            };
+            return appointment;
         } 
     }
 }

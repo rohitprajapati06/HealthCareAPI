@@ -20,29 +20,29 @@ namespace SmartHealthcare.Application.Features.Doctors.Queries.GetDoctorsById
 
         public async Task<DoctorResponse> Handle(GetDoctorsByIdQuery request , CancellationToken cancellationToken)
         {
-            var doctors = await dbContext.DoctorProfiles
-                .Include(x => x.User)
-                .Include(x => x.Hospital)
-                .FirstOrDefaultAsync(x => x.Id == request.Id,cancellationToken);
+            var doctor = await dbContext.DoctorProfiles
+                .AsNoTracking()
+                .Where(x => x.Id == request.Id)
+                .Select(x => new DoctorResponse
+                {
+                    Id = x.Id,
+                    UserId = x.UserId,
+                    Email = x.User.Email,
+                    FirstName = x.User.FirstName,
+                    LastName = x.User.LastName,
+                    Specialization = x.Specialization,
+                    ExperienceYears = x.ExperienceYears,
+                    HospitalName = x.Hospital.Name,
+                    ConsultationFee = x.ConsultationFee,
+                    Qualification = x.Qualification
+                }).FirstOrDefaultAsync(cancellationToken);
 
-            if(doctors == null)
+            if(doctor == null)
             {
-                throw new NotFoundException("Doctor Not Found");
+                throw new NotFoundException("Doctor not found");
             }
 
-            return new DoctorResponse
-            {
-                Id = doctors.Id,
-                UserId = doctors.UserId,
-                Email = doctors.User.Email,
-                FirstName = doctors.User.FirstName,
-                LastName = doctors.User.LastName,
-                Specialization = doctors.Specialization,
-                ExperienceYears = doctors.ExperienceYears,
-                HospitalName = doctors.Hospital.Name,   
-                ConsultationFee = doctors.ConsultationFee,
-                Qualification = doctors.Qualification,
-            };
+            return doctor;
             
         }
     }

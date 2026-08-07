@@ -11,9 +11,9 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Update
     public class UpdateAvailabilitySlotCommandHandler : IRequestHandler<UpdateAvailabilitySlotCommand>
     {
         private readonly IApplicationDbContext context;
-        private readonly ILogger logger;
+        private readonly ILogger<UpdateAvailabilitySlotCommandHandler> logger;
 
-        public UpdateAvailabilitySlotCommandHandler(IApplicationDbContext context , ILogger logger)
+        public UpdateAvailabilitySlotCommandHandler(IApplicationDbContext context , ILogger<UpdateAvailabilitySlotCommandHandler> logger)
         {
             this.context = context;
             this.logger = logger;
@@ -36,12 +36,14 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Update
 
             if (slot.IsBooked)
             {
-                throw new ConflictException("There is no slot available");
+                throw new ConflictException("Booked availability slots cannot be updated.");
             }
 
-            if(slot.Date < DateOnly.FromDateTime(DateTime.Today))
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
+            if (slot.Date < today)
             {
-                throw new ConflictException("You cannot update the past date slots");
+                throw new BadRequestException("Past availability slots cannot be updated.");
             }
 
             if(request.EndTime <= request.StartTime)
@@ -64,7 +66,7 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Update
 
             await context.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation($"Available slot has been updated {slot.Id}");
+            logger.LogInformation("Availability slot {SlotId} updated for Doctor {DoctorId}.", slot.Id, slot.DoctorId);
 
             return Unit.Value;
         }

@@ -18,16 +18,14 @@ namespace SmartHealthcare.Application.Features.Appointments.Queries.GetPatientAp
         public async Task<List<AppointmentResponse>> Handle(GetPatientAppointmentsQuery request , CancellationToken cancellationToken)
         {
             return await dbContext.Appointments
-                .Include(x => x.Doctor).ThenInclude(u => u.User)
-                .Include(x => x.Patient).ThenInclude(u => u.User)
-                .Include(x => x.Hospital)
-                .Include(x => x.AvailabilitySlot)
+                .AsNoTracking()
                 .Where(x => x.PatientId == request.PatientId)
+                .OrderByDescending(x => x.AppointmentDate)
                 .Select(x => new AppointmentResponse
                 {
                     Id = x.Id,
                     DoctorId = x.DoctorId,
-                    DoctorName = x.Doctor.User.FirstName +" "+ x.Doctor.User.FirstName,
+                    DoctorName = x.Doctor.User.FirstName +" "+ x.Doctor.User.LastName,
                     PatientId = x.PatientId,
                     PatientName = x.Patient.User.FirstName +" "+ x.Patient.User.LastName,
                     HospitalId = x.HospitalId,

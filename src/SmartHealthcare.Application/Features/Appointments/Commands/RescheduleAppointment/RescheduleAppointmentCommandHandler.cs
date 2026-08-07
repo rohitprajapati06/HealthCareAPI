@@ -13,9 +13,9 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.RescheduleA
     public class RescheduleAppointmentCommandHandler : IRequestHandler<RescheduleAppointmentCommand , Unit>
     {
         private readonly IApplicationDbContext context;
-        private readonly ILogger logger;
+        private readonly ILogger<RescheduleAppointmentCommandHandler> logger;
 
-        public RescheduleAppointmentCommandHandler(IApplicationDbContext context,ILogger logger)
+        public RescheduleAppointmentCommandHandler(IApplicationDbContext context,ILogger<RescheduleAppointmentCommandHandler> logger)
         {
             this.context = context;
             this.logger = logger;
@@ -23,32 +23,30 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.RescheduleA
 
         public async Task<Unit> Handle(RescheduleAppointmentCommand request , CancellationToken cancellationToken) 
         {
-            var appointments = await context.Appointments
-                .Include(x => x.AvailabilitySlot)
-                .FirstOrDefaultAsync(x => x.Id == request.AppointmentId);
+            var appointment = await context.Appointments.FirstOrDefaultAsync(x => x.Id == request.AppointmentId,cancellationToken);
 
-            if(appointments == null)
+            if(appointment == null)
             {
                 throw new NotFoundException("Appointment not found");
             }
 
-            if(appointments.Status != AppointmentStatus.Pending)
+            if(appointment.Status != AppointmentStatus.Pending)
             {
-                throw new BadRequestException("Appointment is not Pending");
+                throw new BadRequestException("Only pending appointments can be rescheduled.");
             }
 
-            if(appointments.Status == AppointmentStatus.Completed)
+            if(appointment.Status == AppointmentStatus.Completed)
             {
                 throw new BadRequestException("Appointment has been compeleted");
             }
 
-            if(appointments.Status == AppointmentStatus.Cancelled)
+            if(appointment.Status == AppointmentStatus.Cancelled)
             {
                 throw new BadRequestException("Appointment has been cancelled");
             }
 
 
-            var newSlot = await context.AvailabilitySlots.FirstOrDefaultAsync(x => x.Id == request.AvailabilitySlotId);
+            var newSlot = await context.AvailabilitySlots.FirstOrDefaultAsync(x => x.Id == request.AvailabilitySlotId,cancellationToken);
 
             if(newSlot == null)
             {
@@ -60,23 +58,53 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.RescheduleA
                 throw new ConflictException("Slot is already book");
             }
 
-            if(newSlot.DoctorId != appointments.DoctorId)
+            if(newSlot.DoctorId != appointment.DoctorId)
             {
                 throw new ForbiddenException("The slot does not belong to the doctor");
 
             }
 
-            appointments.AvailabilitySlot.IsBooked = false;
+            var oldSlot = await context.AvailabilitySlots.FirstOrDefaultAsync(x => x.Id == appointment.AvailabilitySlotId,cancellationToken);
 
+            if (oldSlot == null)
+            {
+                throw new NotFoundException("Current availability slot not found.");
+            }
+
+
+            var newAppointmentDate = newSlot.Date.ToDateTime(newSlot.StartTime);
+
+            if (newAppointmentDate <= DateTime.Now)
+            {
+                throw new BadRequestException("Cannot reschedule to a past slot.");
+            }
+
+            bool patientBusy = await context.Appointments.AnyAsync(x =>x.PatientId == appointment.PatientId 
+                   && x.Id != appointment.Id &&x.AppointmentDate == newAppointmentDate,cancellationToken);
+
+            if (patientBusy)
+            {
+                throw new ConflictException("Patient already has another appointment at this time.");
+            }
+
+            bool doctorBusy = await context.Appointments.AnyAsync(x =>x.DoctorId == appointment.DoctorId 
+                    &&  x.Id != appointment.Id && x.AppointmentDate == newAppointmentDate,cancellationToken);
+
+            if (doctorBusy)
+            {
+                throw new ConflictException("Doctor already has another appointment at this time.");
+            }
+
+            oldSlot.IsBooked = false;
             newSlot.IsBooked = true;
 
-            appointments.AvailabilitySlotId = newSlot.Id;
-
-            appointments.AppointmentDate = newSlot.Date.ToDateTime(newSlot.StartTime);
+            appointment.AvailabilitySlotId = newSlot.Id;
+            appointment.AppointmentDate = newAppointmentDate;
 
             await context.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation($"Appointment rescheduled - {appointments.Id}");
+            logger.LogInformation("Appointment {AppointmentId} rescheduled from Slot {OldSlotId} to Slot {NewSlotId}.", 
+                appointment.Id,oldSlot.Id,newSlot.Id);
 
             return Unit.Value;
 
