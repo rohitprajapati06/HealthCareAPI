@@ -1,6 +1,5 @@
 ﻿
 using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
@@ -20,25 +19,26 @@ namespace SmartHealthcare.Application.Features.Dashboard.Queries.GetPatientDashb
 
         public async Task<PatientDashboardResponse> Handle(GetPatientDashboardQuery request , CancellationToken cancellationToken)
         {
-            var patientId = await context.PatientProfiles.FirstOrDefaultAsync(x => x.Id == request.PatientId);
+            var patientId = await context.PatientProfiles.AnyAsync(x => x.Id == request.PatientId,cancellationToken);
 
-            if(patientId == null)
+            if(!patientId)
             {
                 throw new NotFoundException("Patient Not Found");
             }
 
             var response = new PatientDashboardResponse
             {
-                upcomingAppointment = await context.Appointments.CountAsync(x => x.PatientId == request.PatientId
+                UpcomingAppointment = await context.Appointments.CountAsync(x => x.PatientId == request.PatientId 
+                        && x.AppointmentDate > DateTime.Now 
                         && x.Status == AppointmentStatus.Confirmed, cancellationToken),
 
-                completedAppointment = await context.Appointments.CountAsync(x => x.PatientId == request.PatientId
+                CompletedAppointment = await context.Appointments.CountAsync(x => x.PatientId == request.PatientId
                         && x.Status == AppointmentStatus.Completed, cancellationToken),
 
-                cancelledAppointment = await context.Appointments.CountAsync(x => x.PatientId == request.PatientId
+                CancelledAppointment = await context.Appointments.CountAsync(x => x.PatientId == request.PatientId
                         && x.Status == AppointmentStatus.Cancelled, cancellationToken),
 
-                medicalRecords = await context.MedicalRecords.CountAsync(x => x.PatientId == request.PatientId,cancellationToken),
+                MedicalRecords = await context.MedicalRecords.CountAsync(x => x.PatientId == request.PatientId,cancellationToken),
 
                 Prescriptions = await context.Prescriptions.CountAsync( x=> x.Appointment.PatientId == request.PatientId,cancellationToken)
             };

@@ -1,33 +1,29 @@
-﻿
-
-namespace SmartHealthcare.Application.Features.Dashboard.Responses
+﻿namespace SmartHealthcare.Application.Features.Dashboard.Responses
 {
     public class AdminDashboardResponse
     {
-        public int totalHospitals { get; set;  }
+        public int TotalHospitals { get; set; }
 
-        public int totalDoctors { get; set; }
+        public int TotalDoctors { get; set; }
 
-        public int approvedDoctors { get; set; }
+        public int ApprovedDoctors { get; set; }
 
-        public int pendingDoctors { get; set; }
+        public int PendingDoctors { get; set; }
 
-        public int rejectedDoctors { get; set; }
+        public int RejectedDoctors { get; set; }
 
-        public int totalPatients    { get; set; }
+        public int TotalPatients { get; set; }
 
-        public int totalAppointments { get; set; }
+        public int TotalAppointments { get; set; }
 
-        public int completedAppointments { get; set; }
+        public int CompletedAppointments { get; set; }
 
-        public int pendingAppointments { get; set; }
+        public int PendingAppointments { get; set; }
 
-        public int cancelledAppointments { get; set; }
+        public int CancelledAppointments { get; set; }
 
-        public int totalPrescriptions { get; set; }
+        public int TotalPrescriptions { get; set; }
 
-        public int totalMedicalRecords  { get; set; }
-
-
+        public int TotalMedicalRecords { get; set; }
     }
 }

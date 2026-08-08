@@ -21,18 +21,18 @@ namespace SmartHealthcare.Application.Features.Dashboard.Queries.GetAdminDashboa
         {
             var response = new AdminDashboardResponse {
 
-             totalHospitals = await context.Hospitals.CountAsync(cancellationToken),
-             totalDoctors = await context.DoctorProfiles.CountAsync(cancellationToken),
-             approvedDoctors = await context.DoctorProfiles.CountAsync(x => x.ApprovalStatus == DoctorApprovalStatus.Approved),
-             pendingDoctors = await context.DoctorProfiles.CountAsync(x => x.ApprovalStatus == DoctorApprovalStatus.Pending),
-             rejectedDoctors = await context.DoctorProfiles.CountAsync(x => x.ApprovalStatus == DoctorApprovalStatus.Rejected),
-             totalPatients = await context.PatientProfiles.CountAsync(cancellationToken),
-             totalAppointments = await context.Appointments.CountAsync(cancellationToken),
-             completedAppointments = await context.Appointments.CountAsync(x => x.Status == AppointmentStatus.Completed),
-             pendingAppointments = await context.Appointments.CountAsync(x => x.Status == AppointmentStatus.Pending),
-             cancelledAppointments = await context.Appointments.CountAsync(x => x.Status == AppointmentStatus.Cancelled),
-             totalPrescriptions = await context.Prescriptions.CountAsync(cancellationToken),
-             totalMedicalRecords = await context.MedicalRecords.CountAsync(cancellationToken)
+             TotalHospitals = await context.Hospitals.CountAsync(cancellationToken),
+             TotalDoctors = await context.DoctorProfiles.CountAsync(cancellationToken),
+             ApprovedDoctors = await context.DoctorProfiles.CountAsync(x => x.ApprovalStatus == DoctorApprovalStatus.Approved, cancellationToken),
+             PendingDoctors = await context.DoctorProfiles.CountAsync(x => x.ApprovalStatus == DoctorApprovalStatus.Pending, cancellationToken),
+             RejectedDoctors = await context.DoctorProfiles.CountAsync(x => x.ApprovalStatus == DoctorApprovalStatus.Rejected,cancellationToken),
+             TotalPatients = await context.PatientProfiles.CountAsync(cancellationToken),
+             TotalAppointments = await context.Appointments.CountAsync(cancellationToken),
+             CompletedAppointments = await context.Appointments.CountAsync(x => x.Status == AppointmentStatus.Completed, cancellationToken),
+             PendingAppointments = await context.Appointments.CountAsync(x => x.Status == AppointmentStatus.Pending,cancellationToken),
+             CancelledAppointments = await context.Appointments.CountAsync(x => x.Status == AppointmentStatus.Cancelled,cancellationToken),
+             TotalPrescriptions = await context.Prescriptions.CountAsync(cancellationToken),
+             TotalMedicalRecords = await context.MedicalRecords.CountAsync(cancellationToken)
 
             };
 

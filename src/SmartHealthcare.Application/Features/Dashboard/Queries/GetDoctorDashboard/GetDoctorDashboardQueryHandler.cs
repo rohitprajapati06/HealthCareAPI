@@ -23,32 +23,26 @@ namespace SmartHealthcare.Application.Features.Dashboard.Queries.GetDoctorDashbo
 
             var response = new DoctorDashboardResponse
             {
-                todayAppointments = await context.Appointments.CountAsync(x => x.Id == request.DoctorId
+                TodayAppointments = await context.Appointments.CountAsync(x => x.DoctorId == request.DoctorId
                                 && DateOnly.FromDateTime(x.AppointmentDate) == today, cancellationToken),
 
-                pendingAppointments = await context.Appointments.CountAsync(x => x.Id == request.DoctorId
+                PendingAppointments = await context.Appointments.CountAsync(x => x.DoctorId == request.DoctorId
                                 && x.Status == AppointmentStatus.Pending, cancellationToken),
 
-                completedAppointment = await context.Appointments.CountAsync(x => x.Id == request.DoctorId
+                CompletedAppointments = await context.Appointments.CountAsync(x => x.DoctorId == request.DoctorId
                                 && x.Status == AppointmentStatus.Completed, cancellationToken),
 
-                availableSlots = await context.AvailabilitySlots.CountAsync(x => x.Id == request.DoctorId
+                AvailableSlots = await context.AvailabilitySlots.CountAsync(x => x.DoctorId == request.DoctorId
                                 && !x.IsBooked, cancellationToken),
 
-                prescriptionsCreated = await context.Prescriptions.CountAsync(x => x.Id == request.DoctorId,cancellationToken),
+                PrescriptionsCreated = await context.Prescriptions.CountAsync(x => x.DoctorId == request.DoctorId,cancellationToken),
 
 
-                PatientTreated = await context.Appointments.Where( x => x.DoctorId == request.DoctorId 
+                PatientsTreated = await context.Appointments.Where( x => x.DoctorId == request.DoctorId 
                             && x.Status == AppointmentStatus.Completed)
                             .Select(x => x.PatientId)
                             .Distinct()
                             .CountAsync(cancellationToken)
-
-
-
-
-
-
 
             };
              

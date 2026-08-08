@@ -1,20 +1,17 @@
-﻿
-
-namespace SmartHealthcare.Application.Features.Dashboard.Responses
+﻿namespace SmartHealthcare.Application.Features.Dashboard.Responses
 {
     public class DoctorDashboardResponse
     {
-        public int todayAppointments { get; set; }
+        public int TodayAppointments { get; set; }
 
-        public int pendingAppointments { get; set; }
+        public int PendingAppointments { get; set; }
 
-        public int completedAppointment { get; set; }
+        public int CompletedAppointments { get; set; }
 
-        public int availableSlots { get; set; }
+        public int AvailableSlots { get; set; }
 
-        public int prescriptionsCreated { get; set; }
+        public int PrescriptionsCreated { get; set; }
 
-        public int PatientTreated { get; set; }
-
+        public int PatientsTreated { get; set; }
     }
 }
