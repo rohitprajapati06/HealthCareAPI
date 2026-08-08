@@ -13,10 +13,10 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
     public class CreateMedicalRecordCommandHandler : IRequestHandler<CreateMedicalRecordCommand,Guid>
     {
         private readonly IApplicationDbContext context;
-        private readonly ILogger logger;
+        private readonly ILogger<CreateMedicalRecordCommandHandler> logger;
         private readonly IFileStorageService fileStorageService;
 
-        public CreateMedicalRecordCommandHandler(IApplicationDbContext context , ILogger logger , IFileStorageService fileStorageService)
+        public CreateMedicalRecordCommandHandler(IApplicationDbContext context , ILogger<CreateMedicalRecordCommandHandler> logger , IFileStorageService fileStorageService)
         {
             this.context = context;
             this.logger = logger;
@@ -49,7 +49,7 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
                 FileUrl = uploadResult.FileURL,
                 RecordType = request.RecordType
             };
-            await context.MedicalRecords.AddAsync(medicalrecord);
+            await context.MedicalRecords.AddAsync(medicalrecord,cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
             logger.LogInformation(

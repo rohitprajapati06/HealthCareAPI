@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.MedicalRecords.Responses;
 
@@ -30,6 +31,11 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Queries.GetPatient
                     RecordType = x.RecordType,
                     CreatedAt = x.CreatedAt
                 }).ToListAsync(cancellationToken);
+
+            if(medicalRecords == null)
+            {
+                throw new NotFoundException("Medical records not found");
+            }
 
             return medicalRecords;
         }

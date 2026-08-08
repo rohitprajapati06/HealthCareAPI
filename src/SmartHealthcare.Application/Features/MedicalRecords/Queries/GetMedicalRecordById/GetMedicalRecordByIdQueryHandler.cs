@@ -19,29 +19,30 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Queries.GetMedical
 
         public async Task<MedicalRecordResponse> Handle(GetMedicalRecordById request , CancellationToken cancellationToken)
         {
-            var records = await context.MedicalRecords
-                .Include(x => x.Patient).ThenInclude(x => x.User)
-                .Include(x => x.Hospital)
-                .FirstOrDefaultAsync(x => x.Id == request.Id , cancellationToken);
+            var record = await context.MedicalRecords
+                .AsNoTracking()
+                .Where(x => x.Id == request.Id)
+                .Select(x => new MedicalRecordResponse
+                {
+                    Id = x.Id,
+                    HospitalId = x.HospitalId,
+                    HospitalName = x.Hospital.Name,
+                    PatientId = x.PatientId,
+                    PatientName = x.Patient.User.FirstName + " " + x.Patient.User.LastName,
+                    FileName = x.FileName,
+                    FileUrl = x.FileUrl,
+                    RecordType = x.RecordType,
+                    CreatedAt = x.CreatedAt,
+                }).FirstOrDefaultAsync(cancellationToken);
                 
 
-            if(records == null)
+            if(record == null)
             {
                 throw new NotFoundException("No Medical Record found");
             }
 
-             return new MedicalRecordResponse
-            {
-                Id = records.Id,
-                HospitalId = records.HospitalId ,
-                HospitalName = records.Hospital.Name,
-                PatientId = records.PatientId,
-                PatientName = records.Patient.User.FirstName + " " + records.Patient.User.LastName,
-                FileName = records.FileName ,
-                FileUrl = records.FileUrl,   
-                RecordType = records.RecordType ,
-                CreatedAt = records.CreatedAt ,
-            };
+            return record;
+            
 
         }
     }
