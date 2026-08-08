@@ -10,9 +10,9 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Commands.UpdatePres
     public class UpdatePrescriptionCommandHandler : IRequestHandler<UpdatePrescriptionCommand,Unit>
     {
         private readonly IApplicationDbContext context;
-        private readonly ILogger logger;
+        private readonly ILogger<UpdatePrescriptionCommandHandler> logger;
 
-        public UpdatePrescriptionCommandHandler(IApplicationDbContext context , ILogger logger)
+        public UpdatePrescriptionCommandHandler(IApplicationDbContext context , ILogger<UpdatePrescriptionCommandHandler> logger)
         {
             this.context = context;
             this.logger = logger;
@@ -32,7 +32,7 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Commands.UpdatePres
 
             await context.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation($"Prescription Updated - {request.PrescriptionId}");
+            logger.LogInformation("Prescription Updated {PrescriptionId}",prescriptions.Id);
 
             return Unit.Value;
 

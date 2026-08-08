@@ -12,9 +12,9 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Commands.CreatePres
     public class CreatePrescriptionCommandHandler : IRequestHandler<CreatePrescriptionCommand,Guid>
     {
         private readonly IApplicationDbContext context;
-        private readonly ILogger logger;
+        private readonly ILogger<CreatePrescriptionCommandHandler> logger;
 
-        public CreatePrescriptionCommandHandler(IApplicationDbContext context , ILogger logger)
+        public CreatePrescriptionCommandHandler(IApplicationDbContext context , ILogger<CreatePrescriptionCommandHandler> logger)
         {
             this.context = context;
             this.logger = logger;
@@ -55,12 +55,13 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Commands.CreatePres
                 CreatedAt = DateTime.UtcNow
             };
 
-           await context.Prescriptions.AddAsync(prescription);
+           await context.Prescriptions.AddAsync(prescription,cancellationToken);
            
            await context.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation($" Prescriptionn created - {prescription.Id}");
-            
+            logger.LogInformation("Prescription {PrescriptionId} created successfully for Appointment {AppointmentId} by Doctor {DoctorId}.",
+                prescription.Id,prescription.AppointmentId,prescription.DoctorId);
+
             return prescription.Id;
         }
     }

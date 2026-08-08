@@ -1,11 +1,8 @@
-﻿
-
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Prescriptions.Responses;
-using SmartHealthcare.Domain.Entities;
 
 namespace SmartHealthcare.Application.Features.Prescriptions.Queries.GetPrescriptionById
 {
@@ -18,27 +15,30 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Queries.GetPrescrip
             this.context = context;
         }
 
-        public async Task<PrescriptionsResponses> Handle(GetPrescriptionByIdQuery request , CancellationToken cancellationToken)
+        public async Task<PrescriptionsResponses> Handle(GetPrescriptionByIdQuery request, CancellationToken cancellationToken)
         {
             var prescription = await context.Prescriptions
-                .Include(x => x.DoctorProfile).ThenInclude(u => u.User)
-                .FirstOrDefaultAsync(x => x.Id == request.PrescriptionId);
+                .AsNoTracking()
+                .Where(x => x.Id == request.PrescriptionId)
+                .Select(x => new PrescriptionsResponses
+                {
+                    Id = x.Id,
+                    AppointmentId = x.AppointmentId,
+                    DoctorId = x.DoctorId,
+                    DoctorName = x.DoctorProfile.User.FirstName + " " + x.DoctorProfile.User.LastName,
+                    Instructions = x.Instructions,
+                    Medication = x.Medication,
+                    CreatedAt = x.CreatedAt,
 
-            if(prescription == null)
+                }).FirstOrDefaultAsync(cancellationToken);
+
+            if (prescription == null)
             {
                 throw new NotFoundException("Prescription not found");
             }
 
-            return new PrescriptionsResponses
-            {
-                Id = prescription.Id,
-                AppointmentId = prescription.AppointmentId,
-                DoctorId = prescription.DoctorId,
-                DoctorName = prescription.DoctorProfile.User.FirstName + " " + prescription.DoctorProfile.User.LastName,
-                Instructions = prescription.Instructions,
-                Medication = prescription.Medication,
-                CreatedAt = prescription.CreatedAt,
-            };
+            return prescription;
         }
+            
     }
 }

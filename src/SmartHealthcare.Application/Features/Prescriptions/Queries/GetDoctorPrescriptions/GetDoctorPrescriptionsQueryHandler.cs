@@ -19,12 +19,11 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Queries.GetDoctorPr
         public async Task<List<PrescriptionsResponses>> Handle(GetDoctorPrescriptionsQuery request , CancellationToken cancellationToken) 
         {
             return await dbContext.Prescriptions
-                .Include(d => d.DoctorProfile).ThenInclude(u => u.User)
-                .Include(a => a.Appointment)
+                .AsNoTracking()
                 .Where(x => x.DoctorId == request.DoctorId)
                 .Select(x => new PrescriptionsResponses
                 {
-                    Id = x.DoctorId,
+                    Id = x.Id,
                     DoctorId = x.DoctorId,
                     DoctorName = x.DoctorProfile.User.FirstName + " "+ x.DoctorProfile.User.LastName,
                     AppointmentId = x.AppointmentId,
