@@ -4,16 +4,16 @@ using SmartHealthcare.Domain.Entities;
 
 namespace SmartHealthcare.Application.Features.MedicalRecords.Responses
 {
-    public class MedicalRecordResponse 
+    public sealed class MedicalRecordResponse 
     {
-        public Guid Id { get; set; }
-        public Guid PatientId { get; set; }
-        public Guid HospitalId { get; set; }
-        public string PatientName { get; set; } = string.Empty;
-        public string HospitalName { get; set; } = string.Empty;
-        public string FileName { get; set; } = string.Empty;
-        public string FileUrl { get; set; } = string.Empty;
-        public string RecordType { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
+        public Guid Id { get; init; }
+        public Guid PatientId { get; init; }
+        public Guid HospitalId { get; init; }
+        public string PatientName { get; init; } = string.Empty;
+        public string HospitalName { get; init; } = string.Empty;
+        public string FileName { get; init; } = string.Empty;
+        public string FileUrl { get; init; } = string.Empty;
+        public string RecordType { get; init; } = string.Empty;
+        public DateTime CreatedAt { get; init; }
     }
 }

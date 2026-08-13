@@ -3,31 +3,31 @@ using SmartHealthcare.Domain.Entities;
 
 namespace SmartHealthcare.Application.Features.Appointments.Responses
 {
-    public class AppointmentResponse
+    public sealed class AppointmentResponse
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; init ; }
 
 
-        public Guid DoctorId { get; set; }
-        public string DoctorName { get; set; }
+        public Guid DoctorId { get; init; }
+        public string DoctorName { get; init; }
 
 
-        public Guid HospitalId { get; set; }
-        public string HospitalName { get; set; }
+        public Guid HospitalId { get; init; }
+        public string HospitalName { get; init; }
 
 
 
-        public Guid PatientId { get; set; }
-        public string PatientName { get; set; }
+        public Guid PatientId { get; init; }
+        public string PatientName { get; init; }
 
 
-        public Guid AvailabilitySlotId { get; set; }
+        public Guid AvailabilitySlotId { get; init; }
 
-        public DateTime AppointmentDate { get; set; }
+        public DateTime AppointmentDate { get; init; }
 
-        public string Status { get; set; }
+        public string Status { get; init; } = string.Empty;
 
-        public string? Notes { get; set; }
+        public string? Notes { get; init; }
 
     }
 }

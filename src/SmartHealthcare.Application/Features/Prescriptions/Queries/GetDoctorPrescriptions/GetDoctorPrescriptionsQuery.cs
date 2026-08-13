@@ -6,6 +6,6 @@ using System.Text;
 
 namespace SmartHealthcare.Application.Features.Prescriptions.Queries.GetDoctorPrescriptions
 {
-    public record GetDoctorPrescriptionsQuery(Guid DoctorId) : IRequest <List<PrescriptionsResponses>>;
+    public record GetDoctorPrescriptionsQuery(Guid DoctorId) : IRequest <List<PrescriptionsResponse>>;
     
 }

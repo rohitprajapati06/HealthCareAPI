@@ -2,26 +2,26 @@
 
 namespace SmartHealthcare.Application.Features.Doctors.Responses
 {
-    public class DoctorResponse
+    public sealed class DoctorResponse
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; init; }
 
-        public Guid UserId { get; set; }
+        public Guid UserId { get; init; }
 
-        public string FirstName { get; set; } = string.Empty;
+        public string FirstName { get; init; } = string.Empty;
 
-        public string LastName { get; set; } = string.Empty;
+        public string LastName { get; init; } = string.Empty;
 
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; init; } = string.Empty;
 
-        public string Specialization { get; set; } = string.Empty;
+        public string Specialization { get; init; } = string.Empty;
 
-        public int ExperienceYears { get; set; }
+        public int ExperienceYears { get; init; }
 
-        public decimal ConsultationFee { get; set; }
+        public decimal ConsultationFee { get; init; }
 
-        public string Qualification { get; set; } = string.Empty;
+        public string Qualification { get; init; } = string.Empty;
 
-        public string HospitalName { get; set; } = string.Empty;
+        public string HospitalName { get; init; } = string.Empty;
     }
 }

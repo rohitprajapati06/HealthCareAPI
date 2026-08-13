@@ -31,7 +31,7 @@ namespace SmartHealthCare.API.Controllers
         }
 
         [HttpGet("{prescriptionId}")]
-        public async Task<ActionResult<PrescriptionsResponses>> GetPrescriptionById(Guid prescriptionId)
+        public async Task<ActionResult<PrescriptionsResponse>> GetPrescriptionById(Guid prescriptionId)
         {
             var result = await mediator.Send(
                 new GetPrescriptionByIdQuery(prescriptionId));
@@ -40,14 +40,14 @@ namespace SmartHealthCare.API.Controllers
         }
 
         [HttpGet("patient/{patientId}")]
-        public async Task<ActionResult<PrescriptionsResponses>> GetPatientPrescription(Guid patientId)
+        public async Task<ActionResult<PrescriptionsResponse>> GetPatientPrescription(Guid patientId)
         {
             var result = await mediator.Send(new GetPatientPrescriptionsQuery(patientId));
             return Ok(result);
         }
 
         [HttpGet("doctor/{doctorId}")]
-        public async Task<ActionResult<List<PrescriptionsResponses>>> GetDoctorPrescriptions(Guid doctorId)
+        public async Task<ActionResult<List<PrescriptionsResponse>>> GetDoctorPrescriptions(Guid doctorId)
         {
             var result = await mediator.Send(
                 new GetDoctorPrescriptionsQuery(doctorId));

@@ -2,20 +2,20 @@
 
 namespace SmartHealthcare.Application.Features.Hospitals.Responses
 {
-    public class HospitalResponse
+    public sealed class HospitalResponse
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; init; }
 
-        public string RohiniCode { get; set; } = string.Empty;
+        public string RohiniCode { get; init; } = string.Empty;
 
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; init; } = string.Empty;
 
-        public string Address { get; set; } = string.Empty;
+        public string Address { get; init; } = string.Empty;
 
-        public string City { get; set; } = string.Empty;
+        public string City { get; init; } = string.Empty;
 
-        public string State { get; set; } = string.Empty;
+        public string State { get; init; } = string.Empty;
 
-        public string Country { get; set; } = string.Empty;
+        public string Country { get; init; } = string.Empty;
     }
 }

@@ -6,7 +6,7 @@ using SmartHealthcare.Application.Features.Prescriptions.Responses;
 
 namespace SmartHealthcare.Application.Features.Prescriptions.Queries.GetPrescriptionById
 {
-    public class GetPrescriptionByIdQueryHandler : IRequestHandler<GetPrescriptionByIdQuery,PrescriptionsResponses>
+    public class GetPrescriptionByIdQueryHandler : IRequestHandler<GetPrescriptionByIdQuery,PrescriptionsResponse>
     {
         private readonly IApplicationDbContext context;
 
@@ -15,12 +15,12 @@ namespace SmartHealthcare.Application.Features.Prescriptions.Queries.GetPrescrip
             this.context = context;
         }
 
-        public async Task<PrescriptionsResponses> Handle(GetPrescriptionByIdQuery request, CancellationToken cancellationToken)
+        public async Task<PrescriptionsResponse> Handle(GetPrescriptionByIdQuery request, CancellationToken cancellationToken)
         {
             var prescription = await context.Prescriptions
                 .AsNoTracking()
                 .Where(x => x.Id == request.PrescriptionId)
-                .Select(x => new PrescriptionsResponses
+                .Select(x => new PrescriptionsResponse
                 {
                     Id = x.Id,
                     AppointmentId = x.AppointmentId,

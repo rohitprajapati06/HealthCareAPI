@@ -1,18 +1,18 @@
 ﻿
 namespace SmartHealthcare.Application.Features.AvailabilitySlots.Responses
 {
-    public class AvailabilitySlotResponse
+    public sealed class AvailabilitySlotResponse
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; init; }
 
-        public Guid DoctorId { get; set; }
+        public Guid DoctorId { get; init; }
 
-        public DateOnly Date {  get; set; }
+        public DateOnly Date {  get; init; }
 
-        public TimeOnly StartTime { get; set; }
+        public TimeOnly StartTime { get; init; }
 
-        public TimeOnly EndTime{ get; set; }
+        public TimeOnly EndTime{ get; init; }
 
-        public bool IsBooked { get; set; }
+        public bool IsBooked { get; init; }
     }
 }
