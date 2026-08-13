@@ -9,9 +9,9 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.ResetPassword
     {
         public ResetPasswordCommandValidator()
         {
-            RuleFor(x => x.Email).NotEmpty().EmailAddress();
-            RuleFor(x => x.Token).NotEmpty();
-            RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(8);
+            RuleFor(x => x.Email).NotEmpty().EmailAddress().MaximumLength(256);
+            RuleFor(x => x.Token).NotEmpty().MaximumLength(2048);
+            RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(8).MaximumLength(128);
         }
     }
 }

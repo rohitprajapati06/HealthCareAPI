@@ -8,7 +8,7 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.ForgotPassword
     {
         public ForgotPasswordCommandValidator()
         {
-            RuleFor(x => x.Email).EmailAddress().NotEmpty();
+            RuleFor(x => x.Email).EmailAddress().NotEmpty().MaximumLength(256);
         }
     }
 }

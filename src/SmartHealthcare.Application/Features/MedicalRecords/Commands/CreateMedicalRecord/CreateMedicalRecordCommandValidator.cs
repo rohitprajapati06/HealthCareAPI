@@ -7,8 +7,15 @@ namespace SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMed
         public CreateMedicalRecordCommandValidator()
         {
             RuleFor(x => x.HospitalId).NotEmpty();
-            RuleFor(x => x.File.Length).GreaterThan(0);
-            RuleFor(x => x.File).NotNull();
+
+            RuleFor(x => x.File)
+            .NotNull()
+            .WithMessage("Medical record file is required.");
+
+            RuleFor(x => x.File)
+                .Must(file => file != null && file.Length > 0)
+                .WithMessage("Medical record file cannot be empty.");
+
             RuleFor(x => x.RecordType).NotEmpty().MaximumLength(100);
 
         }

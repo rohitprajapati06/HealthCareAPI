@@ -2,9 +2,9 @@
 
 namespace SmartHealthcare.Application.Features.Appointments.Commands.BookAppointment
 {
-    public class BookAppointmentCommandVlidator:AbstractValidator<BookAppointmentCommand>
+    public class BookAppointmentCommandValidator:AbstractValidator<BookAppointmentCommand>
     {
-        public BookAppointmentCommandVlidator()
+        public BookAppointmentCommandValidator()
         {
             RuleFor(x => x.DoctorId).NotEmpty();
 

@@ -14,7 +14,7 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Create
 
             RuleFor(x => x.StartTime).NotEmpty();
 
-            RuleFor(x => x.EndTime).GreaterThan(x => x.StartTime).NotEmpty();
+            RuleFor(x => x.EndTime).GreaterThan(x => x.StartTime).WithMessage("End time must be greater than start time.");
         }
     }
 }
