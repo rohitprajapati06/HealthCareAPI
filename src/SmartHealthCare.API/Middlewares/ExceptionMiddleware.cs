@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthCare.API.Models;
-using System.Net;
 using System.Text.Json;
 
 namespace SmartHealthCare.API.Middlewares
@@ -38,13 +37,13 @@ namespace SmartHealthCare.API.Middlewares
             switch (ex)
             {
                 case UnauthorizedAccessException:
-                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     response.Success = false;
                     response.Message = ex.Message;
                     break;
 
                 case ValidationException validationException:
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
                     response.Success = false;
                     response.Message = "Validation Failed";
                     response.Errors = validationException.Errors.Select(x => x.ErrorMessage).ToList();
@@ -77,7 +76,7 @@ namespace SmartHealthCare.API.Middlewares
 
 
                 default:
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                     response.Success = false;
                     response.Message = "An unexpected error occurred.";
                     break;

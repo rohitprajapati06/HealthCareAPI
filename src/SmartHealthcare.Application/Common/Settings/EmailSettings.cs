@@ -2,14 +2,14 @@
 {
     public class EmailSettings
     {
-        public string FromEmail { get; set; } = string.Empty;
+        public string FromEmail { get; init ; } = string.Empty;
 
-        public string SmtpServer { get; set; } = string.Empty;
+        public string SmtpServer { get; init; } = string.Empty;
 
-        public int Port { get; set; }
+        public int Port { get; init; }
 
-        public string Username { get; set; } = string.Empty;
+        public string Username { get; init; } = string.Empty;
 
-        public string Password { get; set; } = string.Empty;
+        public string Password { get; init; } = string.Empty;
     }
 }

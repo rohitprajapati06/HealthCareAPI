@@ -6,15 +6,15 @@ namespace SmartHealthcare.Application.Common.Settings
 {
     public class JwtSettings
     {
-        public string Secret { get; set; }
+        public string Secret { get; init; } = string.Empty;
 
-        public string Issuer { get; set; }
+        public string Issuer { get; init; } = string.Empty;
 
-        public string Audience { get; set; }
+        public string Audience { get; init; } = string.Empty;
 
-        public int AccessTokenExpirationMinutes { get; set; }
+        public int AccessTokenExpirationMinutes { get; init; }
 
-        public int RefreshTokenExpirationDays { get; set; }
+        public int RefreshTokenExpirationDays { get; init; }
 
     }
 }
