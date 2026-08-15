@@ -6,10 +6,10 @@ namespace SmartHealthcare.Application.Contracts.Identity
 {
     public interface IJwtTokenService
     {
-        Task<AuthResponse> GenerateTokenAsync(ApplicationUser user);
+        Task<AuthResponse> GenerateTokenAsync(ApplicationUser user ,CancellationToken cancellationToken = default);
 
-        Task<AuthResponse> RefreshTokenAsync(string refreshtoken);
+        Task<AuthResponse> RefreshTokenAsync(string refreshtoken, CancellationToken cancellationToken = default);
 
-        Task LogoutAsync(string refreshtoken);
+        Task LogoutAsync(string refreshtoken, CancellationToken cancellationToken = default);
     }
 }
