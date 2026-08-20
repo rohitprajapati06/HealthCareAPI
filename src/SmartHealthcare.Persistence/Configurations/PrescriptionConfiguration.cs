@@ -14,6 +14,12 @@ namespace SmartHealthcare.Persistence.Configurations
                 .WithOne(p => p.Prescription)
                 .HasForeignKey<Prescription>(x => x.AppointmentId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            builder.HasOne(x => x.DoctorProfile)
+                .WithMany(x => x.Prescriptions)
+                .HasForeignKey(x => x.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }
