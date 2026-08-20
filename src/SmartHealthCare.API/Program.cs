@@ -11,6 +11,7 @@ using SmartHealthcare.Persistence.Seed;
 using SmartHealthCare.API.Extensions;
 using System.Text;
 using Serilog;
+using SmartHealthcare.Persistence.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
 

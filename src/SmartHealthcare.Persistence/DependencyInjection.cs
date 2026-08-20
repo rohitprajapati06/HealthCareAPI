@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartHealthcare.Application.Contracts.Persistence;
+using SmartHealthcare.Persistence.Contexts;
 
 namespace SmartHealthcare.Persistence
 {

@@ -15,7 +15,7 @@ namespace SmartHealthcare.Infrastructure.Email
             this.options = options.Value;
         }
 
-        public async Task SendEmailAsync(string to , string subject , string body)
+        public async Task SendEmailAsync(string to , string subject , string body , CancellationToken cancellationToken = default)
         {
             using var smtpclient = new SmtpClient(options.SmtpServer, options.Port) 
             {

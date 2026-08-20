@@ -32,7 +32,7 @@ namespace SmartHealthcare.Infrastructure.Authentication
         }
         
 
-        public async Task<AuthResponse> GenerateTokenAsync(ApplicationUser user)
+        public async Task<AuthResponse> GenerateTokenAsync(ApplicationUser user,CancellationToken cancellationToken = default)
         {
             var roles = await userManager.GetRolesAsync( user );
 
@@ -87,7 +87,7 @@ namespace SmartHealthcare.Infrastructure.Authentication
             return Convert.ToBase64String(randombytes);
         }
 
-        public async Task<AuthResponse> RefreshTokenAsync(string refreshtoken)
+        public async Task<AuthResponse> RefreshTokenAsync(string refreshtoken , CancellationToken cancellationToken = default)
         {
             var storedrefreshtoken = await context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshtoken);
 
@@ -131,7 +131,7 @@ namespace SmartHealthcare.Infrastructure.Authentication
             return authResponse;
         }
 
-        public async Task LogoutAsync(string refreshtoken)
+        public async Task LogoutAsync(string refreshtoken, CancellationToken cancellationToken = default)
         {
             var token = await context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshtoken);
 
