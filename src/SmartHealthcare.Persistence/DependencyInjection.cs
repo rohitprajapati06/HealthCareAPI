@@ -8,13 +8,17 @@ namespace SmartHealthcare.Persistence
 {
     public static class DependencyInjection
     {
-
-        public static IServiceCollection AddPersistance(this IServiceCollection services ,IConfiguration configuration)
+        public static IServiceCollection AddPersistence(this IServiceCollection services,IConfiguration configuration)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
+                configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions =>
+                    {
+                        sqlOptions.MigrationsAssembly(
+                            typeof(ApplicationDbContext).Assembly.FullName);
+                    }));
 
-            services.AddScoped<IApplicationDbContext,ApplicationDbContext>();
+            services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
             return services;
         }

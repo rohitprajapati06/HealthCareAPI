@@ -19,6 +19,9 @@ namespace SmartHealthcare.Persistence.Configurations
                 .WithMany()
                 .HasForeignKey(h => h.HospitalId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(x => x.PatientId);
+
         }
     }
 }

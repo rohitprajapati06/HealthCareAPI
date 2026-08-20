@@ -31,7 +31,7 @@ builder.Services.AddApplication();
 
 builder.Services.AddInfrastucture(builder.Configuration);
 
-builder.Services.AddPersistance(builder.Configuration);
+builder.Services.AddPersistence(builder.Configuration);
 
 
 // Swagger

@@ -27,7 +27,13 @@ namespace SmartHealthcare.Persistence.Configurations
                 .WithMany(a => a.Appointments)
                 .HasForeignKey(x => x.AvailabilitySlotId)
                 .OnDelete(DeleteBehavior.Restrict);
-                
+
+            builder.HasIndex(x => x.DoctorId);
+
+            builder.HasIndex(x => x.PatientId);
+
+            builder.HasIndex(x => x.HospitalId);
+
         }
     }
 }
