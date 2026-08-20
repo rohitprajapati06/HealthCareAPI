@@ -1,11 +1,12 @@
 ﻿
 
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace SmartHealthcare.Application.Features.Hospitals.Commands.ImportHospitals
 {
     public class ImportHospitalsCommand:IRequest
     {
-        public string Filepath { get; set; } = string.Empty;
+        public IFormFile File { get; set; } = null!;
     }
 }

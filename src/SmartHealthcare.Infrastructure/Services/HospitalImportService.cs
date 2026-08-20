@@ -4,7 +4,6 @@ using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Contracts.Services;
 using SmartHealthcare.Domain.Entities;
 
-
 namespace SmartHealthcare.Infrastructure.Services
 {
     public class HospitalImportService : IHospitalImportService
@@ -16,58 +15,63 @@ namespace SmartHealthcare.Infrastructure.Services
             this.context = context;
         }
 
-        public async Task<int> ImportHospitalsAsync(string filepath)
+        public async Task<int> ImportHospitalsAsync(
+            Stream fileStream,
+            CancellationToken cancellationToken = default)
         {
-
-            if (!File.Exists(filepath))
-            {
-                throw new FileNotFoundException(
-                    $"File not found: {filepath}");
-            }
-
-            using var workbook = new XLWorkbook(filepath);
+            using var workbook = new XLWorkbook(fileStream);
 
             var worksheet = workbook.Worksheet(1);
 
             var rows = worksheet.RowsUsed().Skip(1);
 
-            var existingCodes = await context.Hospitals.Select(x => x.RohiniCode).ToHashSetAsync();
+            var existingCodes = await context.Hospitals
+                .Select(x => x.RohiniCode)
+                .ToHashSetAsync(cancellationToken);
 
-            var hospitaltoinsert = new List<Hospital>(); 
+            var hospitalsToInsert = new List<Hospital>();
 
-            foreach (var row in rows) { 
-            
-                    var RohiniCode = row.Cell(2).GetValue<string>().Trim();
+            foreach (var row in rows)
+            {
+                var rohiniCode = row.Cell(2)
+                    .GetValue<string>()
+                    .Trim();
 
-                if (string.IsNullOrWhiteSpace(RohiniCode)) {  continue; }
+                if (string.IsNullOrWhiteSpace(rohiniCode))
+                {
+                    continue;
+                }
 
-                if (existingCodes.Contains(RohiniCode)) {  continue; }
+                if (existingCodes.Contains(rohiniCode))
+                {
+                    continue;
+                }
 
                 var hospital = new Hospital
                 {
-                    RohiniCode = RohiniCode,
+                    RohiniCode = rohiniCode,
                     Name = row.Cell(3).GetValue<string>().Trim(),
                     City = row.Cell(4).GetValue<string>().Trim(),
                     Address = row.Cell(5).GetValue<string>().Trim(),
                     State = "Maharashtra",
                     Country = "India",
-                    IsActive = true,
+                    IsActive = true
                 };
 
-                hospitaltoinsert.Add(hospital);
-
-                existingCodes.Add(RohiniCode);
-
+                hospitalsToInsert.Add(hospital);
+                existingCodes.Add(rohiniCode);
             }
 
-            if (hospitaltoinsert.Count > 0)
+            if (hospitalsToInsert.Count > 0)
             {
-                await context.Hospitals.AddRangeAsync(hospitaltoinsert);
-                await context.SaveChangesAsync();
+                await context.Hospitals.AddRangeAsync(
+                    hospitalsToInsert,
+                    cancellationToken);
+
+                await context.SaveChangesAsync(cancellationToken);
             }
 
-            return hospitaltoinsert.Count;
-
+            return hospitalsToInsert.Count;
         }
     }
 }

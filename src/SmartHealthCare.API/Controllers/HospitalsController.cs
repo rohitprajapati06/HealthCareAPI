@@ -25,7 +25,7 @@ namespace SmartHealthCare.API.Controllers
         }
 
         [HttpPost("import")]
-        public async Task<IActionResult> ImportHospitals([FromBody] ImportHospitalsCommand command)
+        public async Task<IActionResult> ImportHospitals([FromForm] ImportHospitalsCommand command)
         {
             await mediator.Send(command);
 

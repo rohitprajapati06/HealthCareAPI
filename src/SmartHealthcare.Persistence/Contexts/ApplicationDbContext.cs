@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Entities;
 
+
+namespace SmartHealthcare.Persistence.Contexts;
 public class ApplicationDbContext
     : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>,
       IApplicationDbContext
