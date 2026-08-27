@@ -34,7 +34,7 @@ namespace SmartHealthcare.Infrastructure.Email
 
             mailMessage.To.Add(to);
 
-            await smtpclient.SendMailAsync(mailMessage);
+            await smtpclient.SendMailAsync(mailMessage,cancellationToken);
 
         }
     }

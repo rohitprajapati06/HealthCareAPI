@@ -34,7 +34,7 @@ namespace SmartHealthcare.Infrastructure.Authentication
 
         public async Task<AuthResponse> GenerateTokenAsync(ApplicationUser user,CancellationToken cancellationToken = default)
         {
-            var roles = await userManager.GetRolesAsync( user );
+            var roles = await userManager.GetRolesAsync(user);
 
             var claims = new List<Claim>
             {
@@ -89,11 +89,11 @@ namespace SmartHealthcare.Infrastructure.Authentication
 
         public async Task<AuthResponse> RefreshTokenAsync(string refreshtoken , CancellationToken cancellationToken = default)
         {
-            var storedrefreshtoken = await context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshtoken);
+            var storedrefreshtoken = await context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshtoken, cancellationToken);
 
             if(storedrefreshtoken == null)
             {
-                throw new Exception("Invalid Refresh Token");
+                throw new UnauthorizedAccessException("Invalid Refresh Token");
             }
 
             if (storedrefreshtoken.IsRevoked)
@@ -125,24 +125,27 @@ namespace SmartHealthcare.Infrastructure.Authentication
                 IsRevoked = false
             };
 
-            await context.RefreshTokens.AddAsync(newRefreshtoken);
-            await context.SaveChangesAsync();
+            await context.RefreshTokens.AddAsync(newRefreshtoken,cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
 
             return authResponse;
         }
 
         public async Task LogoutAsync(string refreshtoken, CancellationToken cancellationToken = default)
         {
-            var token = await context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshtoken);
+            var token = await context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshtoken,cancellationToken);
 
             if(token == null)
             {
                 throw new UnauthorizedAccessException("Refresh Token Not Found");
             }
 
+            
             token.IsRevoked = true;
-            logger.LogInformation("Refresh Token is revoked");
-            await context.SaveChangesAsync();
+            
+            logger.LogInformation("Refresh Token is revoked for user {UserId}",token.UserId);
+
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 }
