@@ -1,13 +1,17 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartHealthcare.Application.Features.MedicalRecords.Commands.CreateMedicalRecord;
 using SmartHealthcare.Application.Features.MedicalRecords.Commands.DeleteMedicalRecord;
 using SmartHealthcare.Application.Features.MedicalRecords.Commands.UpdateMedicalRecord;
 using SmartHealthcare.Application.Features.MedicalRecords.Queries.GetMedicalRecordById;
 using SmartHealthcare.Application.Features.MedicalRecords.Queries.GetPatientMedicalRecords;
+using SmartHealthcare.Domain.Enums;
 
 namespace SmartHealthCare.API.Controllers
 {
+
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class MedicalRecordController : ControllerBase
@@ -19,6 +23,7 @@ namespace SmartHealthCare.API.Controllers
             this.mediator = mediator;
         }
 
+        [Authorize(Roles = $"{UserRoles.Doctor},{UserRoles.HospitalAdmin},{UserRoles.SuperAdmin}")]
         [HttpPost("CreateMedicalRecord")]
         public async Task<IActionResult> CreateMedicalRecord(
             [FromForm] CreateMedicalRecordCommand command)
@@ -47,8 +52,9 @@ namespace SmartHealthCare.API.Controllers
         }
 
 
+        [Authorize(Roles = $"{UserRoles.Doctor},{UserRoles.HospitalAdmin},{UserRoles.SuperAdmin}")]
         [HttpPut("UpdateMedicalRecordsById/{id}")]
-        public async Task<IActionResult> UpdateMedicalRecordsById(Guid id,[FromForm] UpdateMedicalRecordCommand command)
+        public async Task<IActionResult> UpdateMedicalRecordsById(Guid id, [FromForm] UpdateMedicalRecordCommand command)
         {
             command.Id = id;
             await mediator.Send(command);
@@ -56,6 +62,7 @@ namespace SmartHealthCare.API.Controllers
         }
 
 
+        [Authorize(Roles = $"{UserRoles.HospitalAdmin},{UserRoles.SuperAdmin}")]
         [HttpDelete("DeleteMedicalRecordId/{id}")]
         public async Task<IActionResult> DeleteMedicalRecordsById(Guid id)
         {
