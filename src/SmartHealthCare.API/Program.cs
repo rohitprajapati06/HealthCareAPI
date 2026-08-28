@@ -24,8 +24,8 @@ builder.Host.UseSerilog();
 // Add Controllers
 builder.Services.AddControllers();
 
-builder.Services.AddSingleton<Microsoft.Extensions.Logging.ILogger>(servicepovider => 
-servicepovider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>().CreateLogger("SmartHealthCare"));
+builder.Services.AddSingleton<Microsoft.Extensions.Logging.ILogger>(serviceProvider =>
+serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>().CreateLogger("SmartHealthCare"));
 
 builder.Services.AddApplication();
 
@@ -97,7 +97,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtsettings.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(key),
         ClockSkew = TimeSpan.Zero
-        
+
 
     };
 });
@@ -157,13 +157,15 @@ using (var scope = app.Services.CreateScope())
     await SuperAdminSeeder.SuperAdminSeederAsync(services);
 }
 
-try{
+try
+{
     Log.Information("SmartHealth Care API Started Successfully");
 
     app.Run();
-}catch(Exception ex)
+}
+catch (Exception ex)
 {
-    Log.Fatal(ex,"Applivation termminated Unexpectedly");
+    Log.Fatal(ex, "Application termminated Unexpectedly");
 }
 finally
 {
