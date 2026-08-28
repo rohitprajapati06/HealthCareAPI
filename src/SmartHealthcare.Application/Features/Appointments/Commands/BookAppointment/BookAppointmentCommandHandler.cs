@@ -1,9 +1,8 @@
-﻿
-
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
+using SmartHealthcare.Application.Contracts.Identity;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Domain.Entities;
 using SmartHealthcare.Domain.Enums;
@@ -15,21 +14,39 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.BookAppoint
     {
         private readonly IApplicationDbContext context;
         private readonly ILogger<BookAppointmentCommandHandler> logger;
+        private readonly ICurrentUserService currentUserService;
 
-        public BookAppointmentCommandHandler(IApplicationDbContext context , ILogger<BookAppointmentCommandHandler> logger)
+        public BookAppointmentCommandHandler(IApplicationDbContext context, ILogger<BookAppointmentCommandHandler> logger, ICurrentUserService currentUserService)
         {
             this.context = context;
             this.logger = logger;
+            this.currentUserService = currentUserService;
         }
 
-        public async Task<Guid> Handle(BookAppointmentCommand request , CancellationToken cancellationToken)
+        public async Task<Guid> Handle(BookAppointmentCommand request, CancellationToken cancellationToken)
         {
+
+            // A patient can only ever book on their own behalf. Staff
+            // (Doctor/HospitalAdmin/SuperAdmin) may book on behalf of a patient.
+            if (currentUserService.IsInRole(UserRoles.Patient))
+            {
+                var ownPatientProfileId = await context.PatientProfiles
+                    .AsNoTracking()
+                    .Where(p => p.UserId == currentUserService.UserId)
+                    .Select(p => (Guid?)p.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (ownPatientProfileId == null || ownPatientProfileId != request.PatientId)
+                {
+                    throw new ForbiddenException("You can only book appointments for yourself.");
+                }
+            }
 
             // Validate Doctor
 
-            var doctor = await context.DoctorProfiles.FirstOrDefaultAsync(x => x.Id == request.DoctorId , cancellationToken);
-            
-            if(doctor == null)
+            var doctor = await context.DoctorProfiles.FirstOrDefaultAsync(x => x.Id == request.DoctorId, cancellationToken);
+
+            if (doctor == null)
             {
                 throw new NotFoundException("Doctor not found");
             }
@@ -44,7 +61,7 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.BookAppoint
 
             var patient = await context.PatientProfiles.FirstOrDefaultAsync(x => x.Id == request.PatientId, cancellationToken);
 
-            if(patient == null)
+            if (patient == null)
             {
                 throw new NotFoundException("Patient not found");
             }
@@ -54,7 +71,7 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.BookAppoint
 
             var hospital = await context.Hospitals.FirstOrDefaultAsync(x => x.Id == request.HospitalId, cancellationToken);
 
-            if(hospital == null)
+            if (hospital == null)
             {
                 throw new NotFoundException("Hospital not found");
             }
@@ -67,8 +84,8 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.BookAppoint
             // Validate Slot
 
             var slot = await context.AvailabilitySlots.FirstOrDefaultAsync(x => x.Id == request.AvailabilitySlotId, cancellationToken);
-            
-            if(slot == null)
+
+            if (slot == null)
             {
                 throw new NotFoundException("Slot not found");
             }
@@ -93,21 +110,21 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.BookAppoint
 
             //Check Patient Double Booking
 
-            bool alreadyBooked =  await context.Appointments
-                .AnyAsync(x => x.PatientId == request.PatientId 
-                    && x.AppointmentDate == slot.Date.ToDateTime(slot.StartTime),cancellationToken);
+            bool alreadyBooked = await context.Appointments
+                .AnyAsync(x => x.PatientId == request.PatientId
+                    && x.AppointmentDate == slot.Date.ToDateTime(slot.StartTime), cancellationToken);
 
             if (alreadyBooked)
             {
                 throw new ConflictException("Patient already has an appointment at this time.");
             }
-            
+
 
             //Check Doctor Double Booking
 
             bool doctorBusy = await context.Appointments
-                .AnyAsync(x => x.DoctorId == request.DoctorId 
-                    && x.AppointmentDate == slot.Date.ToDateTime(slot.StartTime),cancellationToken);
+                .AnyAsync(x => x.DoctorId == request.DoctorId
+                    && x.AppointmentDate == slot.Date.ToDateTime(slot.StartTime), cancellationToken);
 
 
             // Create Appointment 
@@ -132,7 +149,7 @@ namespace SmartHealthcare.Application.Features.Appointments.Commands.BookAppoint
             await context.SaveChangesAsync();
 
             logger.LogInformation("Appointment {AppointmentId} booked successfully for Patient {PatientId} with Doctor {DoctorId}."
-                ,appointment.Id,appointment.PatientId,appointment.DoctorId);
+                , appointment.Id, appointment.PatientId, appointment.DoctorId);
 
 
             return appointment.Id;

@@ -1,24 +1,41 @@
-﻿
-
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartHealthcare.Application.Common.Exceptions;
+using SmartHealthcare.Application.Contracts.Identity;
 using SmartHealthcare.Application.Contracts.Persistence;
 using SmartHealthcare.Application.Features.Appointments.Responses;
+using SmartHealthcare.Domain.Enums;
 
 namespace SmartHealthcare.Application.Features.Appointments.Queries.GetDoctorAppointmentsQuery
 {
-    public class GetDoctorAppointmentsQueryHandler : IRequestHandler<GetDoctorAppointmentsQuery,List<AppointmentResponse>>
+    public class GetDoctorAppointmentsQueryHandler : IRequestHandler<GetDoctorAppointmentsQuery, List<AppointmentResponse>>
     {
         private readonly IApplicationDbContext context;
+        private readonly ICurrentUserService currentUserService;
 
-        public GetDoctorAppointmentsQueryHandler(IApplicationDbContext context)
+        public GetDoctorAppointmentsQueryHandler(IApplicationDbContext context, ICurrentUserService currentUserService)
         {
             this.context = context;
+            this.currentUserService = currentUserService;
         }
 
-        public async Task<List<AppointmentResponse>> Handle(GetDoctorAppointmentsQuery request , CancellationToken cancellationToken)
+        public async Task<List<AppointmentResponse>> Handle(GetDoctorAppointmentsQuery request, CancellationToken cancellationToken)
         {
+            
+            if (currentUserService.IsInRole(UserRoles.Doctor))
+            {
+                var ownDoctorProfileId = await context.DoctorProfiles
+                    .AsNoTracking()
+                    .Where(d => d.UserId == currentUserService.UserId)
+                    .Select(d => (Guid?)d.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (ownDoctorProfileId == null || ownDoctorProfileId != request.DoctorId)
+                {
+                    throw new ForbiddenException("You are not allowed to view these appointments.");
+                }
+            }
+
             return await context.Appointments
                 .AsNoTracking()
                 .Where(x => x.DoctorId == request.DoctorId)

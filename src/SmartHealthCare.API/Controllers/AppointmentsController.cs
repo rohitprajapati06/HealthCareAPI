@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmartHealthcare.Application.Features.Appointments.Commands.BookAppointment;
@@ -9,9 +10,11 @@ using SmartHealthcare.Application.Features.Appointments.Queries.GetAppointmentBy
 using SmartHealthcare.Application.Features.Appointments.Queries.GetDoctorAppointmentsQuery;
 using SmartHealthcare.Application.Features.Appointments.Queries.GetHospitalAppointmentsQuery;
 using SmartHealthcare.Application.Features.Appointments.Queries.GetPatientAppointments;
+using SmartHealthcare.Domain.Enums;
 
 namespace SmartHealthCare.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AppointmentsController : ControllerBase
@@ -24,27 +27,28 @@ namespace SmartHealthCare.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> BookAppointment(BookAppointmentCommand command) 
+        public async Task<IActionResult> BookAppointment(BookAppointmentCommand command)
         {
             var appointment = await mediator.Send(command);
 
-            return Ok( appointment);
+            return Ok(appointment);
         }
 
         [HttpGet("{appointmentId}")]
         public async Task<IActionResult> GetAppointmentsById(Guid appointmentId)
         {
             var appointments = await mediator.Send(new GetAppointmentByIdQuery(appointmentId));
-            return Ok( appointments);
+            return Ok(appointments);
         }
 
         [HttpGet("patient/{patientId}")]
-        public async Task<IActionResult> GetPatientAppointments(Guid patientId) 
+        public async Task<IActionResult> GetPatientAppointments(Guid patientId)
         {
             var result = await mediator.Send(new GetPatientAppointmentsQuery(patientId));
             return Ok(result);
         }
 
+        [Authorize(Roles = $"{UserRoles.Doctor},{UserRoles.HospitalAdmin},{UserRoles.SuperAdmin}")]
         [HttpGet("doctor/{doctorId}")]
         public async Task<IActionResult> GetDoctorAppointment(Guid doctorId)
         {
@@ -53,7 +57,9 @@ namespace SmartHealthCare.API.Controllers
         }
 
 
-         [HttpGet("hospital/{hospitalId}")]
+       
+        [Authorize(Roles = $"{UserRoles.HospitalAdmin},{UserRoles.SuperAdmin}")]
+        [HttpGet("hospital/{hospitalId}")]
         public async Task<IActionResult> GetHospitalAppointments(Guid hospitalId)
         {
             var result = await mediator.Send(new GetHospitalAppointmentsQuery(hospitalId));
@@ -61,6 +67,7 @@ namespace SmartHealthCare.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = $"{UserRoles.Doctor},{UserRoles.HospitalAdmin},{UserRoles.SuperAdmin}")]
         [HttpPut("{appointmentId}/complete")]
         public async Task<IActionResult> CompleteAppointment(Guid appointmentId)
         {
@@ -84,14 +91,14 @@ namespace SmartHealthCare.API.Controllers
         }
 
         [HttpPut("{appointmentId}/reschedule")]
-        public async Task<IActionResult> RescheduleAppointment(Guid appointmentId , [FromBody] RescheduleAppointmentCommand command)
+        public async Task<IActionResult> RescheduleAppointment(Guid appointmentId, [FromBody] RescheduleAppointmentCommand command)
         {
 
             command.AppointmentId = appointmentId;
             await mediator.Send(command);
-           
+
             return NoContent();
-            
+
         }
     }
 }

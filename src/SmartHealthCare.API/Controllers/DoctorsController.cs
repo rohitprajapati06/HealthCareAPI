@@ -1,12 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmartHealthcare.Application.Features.Doctors.Commands.ApproveDoctors;
 using SmartHealthcare.Application.Features.Doctors.Commands.RejectDoctors;
 using SmartHealthcare.Application.Features.Doctors.Queries.GetDoctors;
 using SmartHealthcare.Application.Features.Doctors.Queries.GetDoctorsById;
 using SmartHealthcare.Application.Features.Doctors.Queries.SearchDoctors;
+using SmartHealthcare.Domain.Enums;
 
 namespace SmartHealthCare.API.Controllers
 {
@@ -24,7 +24,7 @@ namespace SmartHealthCare.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetDoctors()
         {
-             return Ok(await mediator.Send(new GetDoctorsQuery()));
+            return Ok(await mediator.Send(new GetDoctorsQuery()));
         }
 
 
@@ -35,14 +35,14 @@ namespace SmartHealthCare.API.Controllers
         }
 
 
-        //[Authorize(Roles = "HospitalAdmin,SuperAdmin")]
+        [Authorize(Roles = $"{UserRoles.HospitalAdmin},{UserRoles.SuperAdmin}")]
         [HttpPut("{id}/approve")]
         public async Task<IActionResult> Approve(Guid id)
         {
             return Ok(await mediator.Send(new ApproveDoctorCommand(id)));
         }
 
-        //[Authorize(Roles = "HospitalAdmin,SuperAdmin")]
+        [Authorize(Roles = $"{UserRoles.HospitalAdmin},{UserRoles.SuperAdmin}")]
         [HttpPut("{id}/reject")]
         public async Task<IActionResult> Reject(Guid id)
         {
@@ -50,11 +50,11 @@ namespace SmartHealthCare.API.Controllers
         }
 
         [HttpGet("Search")]
-        public async Task<IActionResult> SearchDoctors( [FromQuery] Guid? HospitalId , [FromQuery]string? Specialization, 
-            [FromQuery] int? Experience , [FromQuery]int? MaxFee, [FromQuery]int? MinFee)
+        public async Task<IActionResult> SearchDoctors([FromQuery] Guid? HospitalId, [FromQuery] string? Specialization,
+            [FromQuery] int? Experience, [FromQuery] int? MaxFee, [FromQuery] int? MinFee)
         {
 
-            return Ok(await mediator.Send(new SearchDoctorsQuery(HospitalId,Specialization,Experience,MaxFee,MinFee)));
+            return Ok(await mediator.Send(new SearchDoctorsQuery(HospitalId, Specialization, Experience, MaxFee, MinFee)));
         }
 
     }
