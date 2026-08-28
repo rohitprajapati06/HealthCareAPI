@@ -1,10 +1,10 @@
-﻿
-
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
+using SmartHealthcare.Application.Contracts.Identity;
 using SmartHealthcare.Application.Contracts.Persistence;
+using SmartHealthcare.Domain.Enums;
 
 namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.UpdateAvailabilitySlot
 {
@@ -12,11 +12,13 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Update
     {
         private readonly IApplicationDbContext context;
         private readonly ILogger<UpdateAvailabilitySlotCommandHandler> logger;
+        private readonly ICurrentUserService currentUserService;
 
-        public UpdateAvailabilitySlotCommandHandler(IApplicationDbContext context , ILogger<UpdateAvailabilitySlotCommandHandler> logger)
+        public UpdateAvailabilitySlotCommandHandler(IApplicationDbContext context, ILogger<UpdateAvailabilitySlotCommandHandler> logger, ICurrentUserService currentUserService)
         {
             this.context = context;
             this.logger = logger;
+            this.currentUserService = currentUserService;
         }
 
         public async Task<Unit> Handle(UpdateAvailabilitySlotCommand request, CancellationToken cancellationToken)
@@ -24,14 +26,28 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Update
             var slot = await context.AvailabilitySlots
                .FirstOrDefaultAsync(x => x.Id == request.SlotId, cancellationToken);
 
-            if(slot == null)
+            if (slot == null)
             {
                 throw new NotFoundException("There is no slots booked");
             }
 
-            if(slot.DoctorId != request.DoctorId)
+            if (slot.DoctorId != request.DoctorId)
             {
                 throw new ForbiddenException("You cannot update the another doctors slots ");
+            }
+
+            // The check above only confirms the slot matches the doctorId in the
+            // route. Confirm the caller actually IS that doctor.
+            if (currentUserService.IsInRole(UserRoles.Doctor))
+            {
+                var callingDoctor = await context.DoctorProfiles
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(d => d.Id == request.DoctorId, cancellationToken);
+
+                if (callingDoctor == null || callingDoctor.UserId != currentUserService.UserId)
+                {
+                    throw new ForbiddenException("You cannot update the another doctors slots ");
+                }
             }
 
             if (slot.IsBooked)
@@ -46,7 +62,7 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Update
                 throw new BadRequestException("Past availability slots cannot be updated.");
             }
 
-            if(request.EndTime <= request.StartTime)
+            if (request.EndTime <= request.StartTime)
             {
                 throw new ConflictException("End time must be greater than the start time");
             }
@@ -58,8 +74,8 @@ namespace SmartHealthcare.Application.Features.AvailabilitySlots.Commands.Update
             if (overlap)
             {
                 throw new ConflictException("This slot is overlap with another slot");
-            }    
-                 
+            }
+
             slot.Date = request.Date;
             slot.StartTime = request.StartTime;
             slot.EndTime = request.EndTime;
