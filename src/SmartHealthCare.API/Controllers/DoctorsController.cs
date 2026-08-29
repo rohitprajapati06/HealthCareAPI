@@ -10,6 +10,11 @@ using SmartHealthcare.Domain.Enums;
 
 namespace SmartHealthCare.API.Controllers
 {
+    // GETs only require login (browsing doctors pre-booking); approve/reject
+    // are admin-only. Explicit here even though the global fallback policy
+    // in Program.cs would also cover it, to stay consistent with the other
+    // controllers and not rely silently on that fallback.
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DoctorsController : ControllerBase
