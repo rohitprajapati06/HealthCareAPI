@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -72,7 +73,6 @@ builder.Services.AddSwaggerGen(options =>
 //JWT Settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
-
 var jwtsettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 if (jwtsettings == null || string.IsNullOrEmpty(jwtsettings.Secret))
 {
@@ -122,6 +122,38 @@ builder.Services
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+// Secure by default: any endpoint without an explicit [Authorize] or
+// [AllowAnonymous] now requires a logged-in user, instead of silently
+// being public the way most controllers were before this review.
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
+
+// CORS: configure allowed origins in appsettings ("Cors:AllowedOrigins").
+// No origins are allowed by default until this is set, so the frontend
+// domain(s) must be added before the browser client can call the API.
+const string CorsPolicyName = "ConfiguredOrigins";
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(CorsPolicyName, policy =>
+    {
+        if (allowedOrigins.Length > 0)
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        }
+        // If nothing is configured, no origins are allowed - fail closed
+        // rather than defaulting to AllowAnyOrigin().
+    });
+});
+
 
 var app = builder.Build();
 
@@ -141,6 +173,8 @@ app.UseStaticFiles();
 app.UseSerilogRequestLogging();
 
 app.UseGlobalExceptionMidddleware();
+
+app.UseCors(CorsPolicyName);
 
 app.UseAuthentication();
 
@@ -165,7 +199,7 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "Application termminated Unexpectedly");
+    Log.Fatal(ex, "Application terminated unexpectedly");
 }
 finally
 {

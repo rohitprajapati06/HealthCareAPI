@@ -21,13 +21,14 @@ public class AuthController : ControllerBase
     private readonly IMediator mediator;
     private readonly ILogger<AuthController> logger;
 
-    public AuthController(IMediator mediator , ILogger<AuthController> logger)
+    public AuthController(IMediator mediator, ILogger<AuthController> logger)
     {
         this.mediator = mediator;
         this.logger = logger;
     }
 
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginCommand command)
     {
@@ -42,6 +43,7 @@ public class AuthController : ControllerBase
         });
     }
 
+    [AllowAnonymous]
     [HttpPost("register/patient")]
     public async Task<IActionResult> RegisterPatient(RegisterPatientCommand command)
     {
@@ -55,14 +57,15 @@ public class AuthController : ControllerBase
         });
     }
 
+    [AllowAnonymous]
     [HttpPost("register/doctor")]
-    public async Task<IActionResult> RegisterDoctor(RegisterDoctorCommand command) 
+    public async Task<IActionResult> RegisterDoctor(RegisterDoctorCommand command)
     {
         logger.LogInformation("Doctor Endpoint Invoked");
         var result = await mediator.Send(command);
         return Ok(new ApiResponse<Guid>
         {
-            Success =true,
+            Success = true,
             Message = "Doctor Registered",
             Data = result
         });
@@ -72,7 +75,7 @@ public class AuthController : ControllerBase
     [HttpGet("me")]
     public async Task<IActionResult> GetCurrentUser()
     {
-        logger.LogInformation($"{nameof(GetCurrentUser)}"); 
+        logger.LogInformation($"{nameof(GetCurrentUser)}");
         var result = await mediator.Send(new GetCurrentUserQuery());
         return Ok(new ApiResponse<CurrentUserResponse>
         {
@@ -82,6 +85,7 @@ public class AuthController : ControllerBase
         });
     }
 
+    [AllowAnonymous]
     [HttpPost("refresh-token")]
     public async Task<IActionResult> GetRefreshToken(RefreshTokenCommand command)
     {
@@ -89,12 +93,13 @@ public class AuthController : ControllerBase
         var result = await mediator.Send(command);
         return Ok(new ApiResponse<AuthResponse>
         {
-            Success =true,
+            Success = true,
             Message = "Refresh token generated",
             Data = result
         });
     }
 
+    [AllowAnonymous]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout(LogoutCommand command)
     {
@@ -102,43 +107,36 @@ public class AuthController : ControllerBase
         var result = await mediator.Send(command);
         return Ok(new ApiResponse
         {
-            Success =true,
+            Success = true,
             Message = "Logout Success"
         });
     }
 
     [Authorize]
     [HttpPost("change-password")]
-    public async Task<IActionResult> ChangePassword(ChangePasswordCommand command) 
+    public async Task<IActionResult> ChangePassword(ChangePasswordCommand command)
     {
         logger.LogInformation("Change-Password Endpoint Invoked");
 
         var result = await mediator.Send(command);
         return Ok(new ApiResponse
         {
-            Success=true,
+            Success = true,
             Message = "Password Change Successfully"
         });
     }
 
+    [AllowAnonymous]
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordCommand command)
     {
         logger.LogInformation("Forgot-Password Endpoint Invoked");
         var result = await mediator.Send(command);
-        return Ok(new ApiResponse { Success = true,Message = "Password reset link sent "}); 
+        return Ok(new ApiResponse { Success = true, Message = "Password reset link sent " });
     }
 
 
-    // Testing only — remove when frontend is ready
-    [HttpGet("reset-password")]
-    public IActionResult ResetPasswordForm([FromQuery] string email, [FromQuery] string token)
-    {
-        logger.LogInformation("reset-password Endpoint Invoked");
-
-        // Just returns the values so you can copy them cleanly
-        return Ok(new { email, token });
-    }
+    [AllowAnonymous]
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(ResetPasswordCommand command)
     {
