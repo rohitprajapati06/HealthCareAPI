@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using SmartHealthcare.Application.Features.Auth.Commands.RefreshUserToken;
 
 namespace SmartHealthcare.UnitTests.Features.Auth

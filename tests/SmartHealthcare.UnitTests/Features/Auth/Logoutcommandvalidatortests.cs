@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using SmartHealthcare.Application.Features.Auth.Commands.Logout;
 
 namespace SmartHealthcare.UnitTests.Features.Auth
