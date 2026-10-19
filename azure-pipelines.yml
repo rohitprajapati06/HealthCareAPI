@@ -26,6 +26,21 @@ steps:
   - script: dotnet restore SmartHealthCare.slnx
     displayName: 'Restore NuGet packages'
 
+  - script: |
+      echo "=== Program.cs ==="
+      cat src/SmartHealthCare.API/Program.cs
+
+      echo "=== API project settings ==="
+      dotnet msbuild src/SmartHealthCare.API/SmartHealthCare.API.csproj \
+        -getProperty:EnableDefaultCompileItems \
+        -getProperty:OutputType \
+        -getProperty:TargetFramework
+
+      echo "=== Compile items ==="
+      dotnet msbuild src/SmartHealthCare.API/SmartHealthCare.API.csproj \
+        -getItem:Compile
+    displayName: 'Diagnose API entry point'
+
   - script: dotnet build SmartHealthCare.slnx --configuration $(buildConfiguration) --no-restore
     displayName: 'Build solution'
 
