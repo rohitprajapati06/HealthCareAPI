@@ -1,0 +1,33 @@
+
+trigger:
+  branches:
+    include:
+      - master
+
+pr:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  dotnetVersion: '10.0.x'
+
+steps:
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      version: '$(dotnetVersion)'
+
+  - script: dotnet restore SmartHealthCare.slnx
+    displayName: 'Restore NuGet packages'
+
+  - script: dotnet build SmartHealthCare.slnx --configuration $(buildConfiguration) --no-restore
+    displayName: 'Build solution'
+
+  - script: dotnet test SmartHealthCare.slnx --configuration $(buildConfiguration) --no-build --logger trx
+    displayName: 'Run unit tests'
