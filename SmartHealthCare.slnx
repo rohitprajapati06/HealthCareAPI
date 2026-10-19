@@ -6,8 +6,8 @@
     <Project Path="src/SmartHealthcare.Persistence/SmartHealthcare.Persistence.csproj" />
     <Project Path="src/SmartHealthcare.Shared/SmartHealthcare.Shared.csproj" />
   </Folder>
-  <Folder Name="/src/SmartHealthcare.API/">
-    <Project Path="src/SmartHealthcare.API/SmartHealthCare.API.csproj" />
+  <Folder Name="/src/SmartHealthCare.API/">
+    <Project Path="src/SmartHealthCare.API/SmartHealthCare.API.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/SmartHealthcare.UnitTests/SmartHealthcare.UnitTests.csproj" />
