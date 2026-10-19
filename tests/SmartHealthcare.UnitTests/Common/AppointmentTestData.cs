@@ -114,5 +114,28 @@ namespace SmartHealthcare.UnitTests.Common
 
             return (hospital, doctor, patient, slot);
         }
+
+
+        public static Appointment CreateAppointment(
+            Guid doctorId,
+            Guid patientId,
+            Guid hospitalId,
+            Guid availabilitySlotId,
+            DateTime appointmentDate,
+            AppointmentStatus status = AppointmentStatus.Pending)
+        {
+            return new Appointment
+            {
+                Id = Guid.NewGuid(),
+                DoctorId = doctorId,
+                PatientId = patientId,
+                HospitalId = hospitalId,
+                AvailabilitySlotId = availabilitySlotId,
+                AppointmentDate = appointmentDate,
+                Status = status,
+                Notes = string.Empty
+            };
+        }
+
     }
 }
