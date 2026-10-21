@@ -15,6 +15,8 @@ pool:
 variables:
   buildConfiguration: 'Release'
   dotnetVersion: '10.0.x'
+  apiProject: 'src/SmartHealthCare.API/SmartHealthCare.API.csproj'
+  publishFolder: '$(Build.ArtifactStagingDirectory)/publish'
 
 steps:
   - task: UseDotNet@2
@@ -26,21 +28,35 @@ steps:
   - script: dotnet restore SmartHealthCare.slnx
     displayName: 'Restore NuGet packages'
 
-  
-  - script: |
-      dotnet msbuild src/SmartHealthCare.API/SmartHealthCare.API.csproj -getItem:Compile > compile-items.json
-
-      if grep -q '"Identity": "Program.cs"' compile-items.json; then
-        echo "Program.cs IS included in compilation"
-      else
-        echo "Program.cs IS NOT included in compilation"
-        grep -n "Program.cs" compile-items.json || true
-      fi
-    displayName: 'Check Program.cs compile inclusion'
-
-
   - script: dotnet build SmartHealthCare.slnx --configuration $(buildConfiguration) --no-restore
     displayName: 'Build solution'
 
   - script: dotnet test SmartHealthCare.slnx --configuration $(buildConfiguration) --no-build --logger trx
     displayName: 'Run unit tests'
+
+  - script: >
+      dotnet publish $(apiProject)
+      --configuration $(buildConfiguration)
+      --no-build
+      --output $(publishFolder)
+    displayName: 'Publish API'
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+  - task: ArchiveFiles@2
+    displayName: 'Package published API'
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    inputs:
+      rootFolderOrFile: '$(publishFolder)'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/SmartHealthcareAPI.zip'
+      replaceExistingArchive: true
+
+  - task: AzureWebApp@1
+    displayName: 'Deploy API to Azure App Service'
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    inputs:
+      azureSubscription: 'SmartHealthcare-Azure-Connection'
+      appType: 'webAppLinux'
+      appName: 'smarthealth-api-0602'
+      package: '$(Build.ArtifactStagingDirectory)/SmartHealthcareAPI.zip'
