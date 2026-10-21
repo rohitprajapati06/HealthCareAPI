@@ -9,23 +9,6 @@ using SmartHealthcare.UnitTests.Common;
 
 namespace SmartHealthcare.UnitTests.Features.Auth
 {
-    /// <summary>
-    /// IMPORTANT: RegisterPatientCommandHandler has an uninitialized-field bug. It declares
-    /// two loggers - `logger1` (ILogger&lt;RegisterPatientCommandHandler&gt;), which the
-    /// constructor actually assigns the injected logger to, and `logger`
-    /// (ILogger&lt;LoginCommandHandler&gt;), which is never assigned and stays null. Handle()
-    /// calls the *unassigned* `logger` field on both the conflict path
-    /// (logger.LogWarning before throwing ConflictException) and the success path
-    /// (logger.LogInformation after SaveChangesAsync), so both currently throw
-    /// NullReferenceException instead of behaving as intended. On the success path this is
-    /// worse than it looks: the user and PatientProfile rows are already committed to the
-    /// database by the time the NRE is thrown, so the caller sees a 500 error even though
-    /// registration actually succeeded. The tests below document this actual behavior;
-    /// see the class-level comment in the handler file before "fixing" these expectations -
-    /// the real fix is in RegisterPatientCommandHandler (assign the constructor's logger
-    /// parameter to the field it actually uses, or better, delete the redundant field and
-    /// use one logger).
-    /// </summary>
     public class RegisterPatientCommandHandlerTests
     {
         private readonly Mock<UserManager<ApplicationUser>> userManagerMock = UserManagerMockFactory.Create();
@@ -49,7 +32,7 @@ namespace SmartHealthcare.UnitTests.Features.Auth
         };
 
         [Fact]
-        public async Task Handle_ValidRequest_PersistsUserAndProfile_ButThrowsNullReferenceExceptionFromUnassignedLogger()
+        public async Task Handle_ValidRequest_PersistsUserAndProfileAndReturnsUserId()
         {
             using var context = TestDbContextFactory.Create();
             var command = ValidCommand();
@@ -57,6 +40,7 @@ namespace SmartHealthcare.UnitTests.Features.Auth
             userManagerMock.Setup(x => x.FindByEmailAsync(command.Email)).ReturnsAsync((ApplicationUser?)null);
             userManagerMock
                 .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), command.Password))
+                .Callback<ApplicationUser, string>((user, _) => user.Id = Guid.NewGuid())
                 .ReturnsAsync(IdentityResult.Success);
             userManagerMock
                 .Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), "Patient"))
@@ -64,10 +48,8 @@ namespace SmartHealthcare.UnitTests.Features.Auth
 
             var handler = CreateHandler(context);
 
-            var act = () => handler.Handle(command, CancellationToken.None);
-
-            // Documents the current bug - see class-level comment.
-            await act.Should().ThrowAsync<NullReferenceException>();
+            var userId = await handler.Handle(command, CancellationToken.None);
+            userId.Should().NotBeEmpty();
 
             // Despite the exception, the write already happened.
             var savedProfile = context.PatientProfiles.Should().ContainSingle().Subject;
@@ -78,7 +60,7 @@ namespace SmartHealthcare.UnitTests.Features.Auth
         }
 
         [Fact]
-        public async Task Handle_EmailAlreadyExists_ThrowsNullReferenceExceptionFromUnassignedLogger_NotConflictException()
+        public async Task Handle_EmailAlreadyExists_ThrowsConflictException()
         {
             using var context = TestDbContextFactory.Create();
             var command = ValidCommand();
@@ -89,10 +71,7 @@ namespace SmartHealthcare.UnitTests.Features.Auth
 
             var act = () => handler.Handle(command, CancellationToken.None);
 
-            // Intended behavior is ConflictException("Email Already Exists"); actual behavior
-            // is NullReferenceException because logger.LogWarning runs first against the
-            // unassigned field. See class-level comment.
-            await act.Should().ThrowAsync<NullReferenceException>();
+            await act.Should().ThrowAsync<ConflictException>().WithMessage("Email Already Exists");
 
             userManagerMock.Verify(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()), Times.Never);
             context.PatientProfiles.Should().BeEmpty();

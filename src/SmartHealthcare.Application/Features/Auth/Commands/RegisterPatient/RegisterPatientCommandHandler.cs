@@ -3,23 +3,21 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using SmartHealthcare.Application.Common.Exceptions;
 using SmartHealthcare.Application.Contracts.Persistence;
-using SmartHealthcare.Application.Features.Auth.Commands.Login;
 using SmartHealthcare.Domain.Entities;
 
 namespace SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient
 {
-    public class RegisterPatientCommandHandler:IRequestHandler<RegisterPatientCommand,Guid>
+    public class RegisterPatientCommandHandler : IRequestHandler<RegisterPatientCommand, Guid>
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IApplicationDbContext context;
-        private readonly ILogger<RegisterPatientCommandHandler> logger1;
-        private readonly ILogger<LoginCommandHandler> logger;
+        private readonly ILogger<RegisterPatientCommandHandler> logger;
 
-        public RegisterPatientCommandHandler(UserManager<ApplicationUser> userManager ,IApplicationDbContext context, ILogger<RegisterPatientCommandHandler> logger  )
+        public RegisterPatientCommandHandler(UserManager<ApplicationUser> userManager, IApplicationDbContext context, ILogger<RegisterPatientCommandHandler> logger)
         {
             this.userManager = userManager;
             this.context = context;
-            logger1 = logger;
+            this.logger = logger;
         }
 
         public async Task<Guid> Handle(RegisterPatientCommand request, CancellationToken cancellationToken)
@@ -27,7 +25,7 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient
 
             var existingUser = await userManager.FindByEmailAsync(request.Email);
 
-            if(existingUser != null)
+            if (existingUser != null)
             {
                 logger.LogWarning($"Failed login attempt for Email {request.Email} ");
                 throw new ConflictException("Email Already Exists");
@@ -43,14 +41,14 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient
                 IsActive = true
             };
 
-            var result = await userManager.CreateAsync(user,request.Password);
+            var result = await userManager.CreateAsync(user, request.Password);
 
-            if (!result.Succeeded) 
+            if (!result.Succeeded)
             {
-                throw new BadRequestException( string.Join(" ",result.Errors.Select(x => x.Description)));
+                throw new BadRequestException(string.Join(" ", result.Errors.Select(x => x.Description)));
             }
 
-            await userManager.AddToRoleAsync(user,"Patient");
+            await userManager.AddToRoleAsync(user, "Patient");
 
             var patientprofile = new PatientProfile
             {
@@ -62,7 +60,7 @@ namespace SmartHealthcare.Application.Features.Auth.Commands.RegisterPatient
                 ExistingConditions = request.ExistingConditions
             };
 
-            await context.PatientProfiles.AddAsync(patientprofile,cancellationToken);
+            await context.PatientProfiles.AddAsync(patientprofile, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
             logger.LogInformation($"{user.Id} patient has been successfully registered");

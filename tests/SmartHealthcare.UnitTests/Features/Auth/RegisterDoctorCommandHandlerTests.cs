@@ -45,6 +45,7 @@ namespace SmartHealthcare.UnitTests.Features.Auth
             userManagerMock.Setup(x => x.FindByEmailAsync(command.Email)).ReturnsAsync((ApplicationUser?)null);
             userManagerMock
                 .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), command.Password))
+                .Callback<ApplicationUser, string>((user, _) => user.Id = Guid.NewGuid())
                 .ReturnsAsync(IdentityResult.Success);
             userManagerMock
                 .Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), "Doctor"))
