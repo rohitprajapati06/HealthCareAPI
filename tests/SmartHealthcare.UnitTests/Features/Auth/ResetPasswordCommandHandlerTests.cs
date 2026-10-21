@@ -20,16 +20,8 @@ namespace SmartHealthcare.UnitTests.Features.Auth
         [Fact]
         public async Task Handle_ValidRequest_CallsResetPasswordWithTheRawTokenAsReceived()
         {
-            // NOTE: the handler Base64Url-decodes request.Token into a `decodedToken`
-            // local variable but never actually uses it - it passes the original
-            // request.Token straight to userManager.ResetPasswordAsync. This test documents
-            // that actual behavior. It happens to line up with ForgotPasswordCommandHandler,
-            // which likewise never uses the Base64Url-*encoded* token it builds and instead
-            // puts the raw token in the reset link - so end to end this currently works,
-            // but only because both dead-code steps cancel out. The Base64UrlDecode call
-            // itself still executes eagerly, so it can throw on tokens containing characters
-            // outside the base64url alphabet before any password reset actually happens
-            // (see the "invalid token characters" test below).
+            // Identity reset tokens are passed through unchanged; URL encoding is handled
+            // by the link transport and the ASP.NET query parser.
             var user = new ApplicationUser { Id = Guid.NewGuid(), Email = "patient@example.com" };
             var command = new ResetPasswordCommand
             {
@@ -53,12 +45,9 @@ namespace SmartHealthcare.UnitTests.Features.Auth
         }
 
         [Fact]
-        public async Task Handle_TokenContainsCharactersOutsideTheBase64UrlAlphabet_ThrowsFormatExceptionBeforeResettingPassword()
+        public async Task Handle_TokenContainsPlusCharacters_PassesOriginalTokenToIdentity()
         {
-            // A '+' is valid in standard Base64 but not in the URL-safe Base64Url alphabet,
-            // so the handler's (unused) decode step throws before it ever calls
-            // ResetPasswordAsync - worth checking against what your real reset-link tokens
-            // actually look like.
+            // Identity tokens can contain '+' and should be passed to Identity intact.
             var user = new ApplicationUser { Id = Guid.NewGuid(), Email = "patient@example.com" };
             var command = new ResetPasswordCommand
             {
@@ -68,16 +57,17 @@ namespace SmartHealthcare.UnitTests.Features.Auth
             };
 
             userManagerMock.Setup(x => x.FindByEmailAsync(command.Email)).ReturnsAsync(user);
+            userManagerMock
+                .Setup(x => x.ResetPasswordAsync(user, command.Token, command.NewPassword))
+                .ReturnsAsync(IdentityResult.Success);
 
             var handler = CreateHandler();
 
             var act = () => handler.Handle(command, CancellationToken.None);
 
-            await act.Should().ThrowAsync<FormatException>();
+            (await act()).Should().BeTrue();
 
-            userManagerMock.Verify(
-                x => x.ResetPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>(), It.IsAny<string>()),
-                Times.Never);
+            userManagerMock.Verify(x => x.ResetPasswordAsync(user, command.Token, command.NewPassword), Times.Once);
         }
 
         [Fact]
