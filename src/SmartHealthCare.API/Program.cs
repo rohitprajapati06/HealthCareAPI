@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -158,13 +159,11 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 
-// Configure Middleware
-if (app.Environment.IsDevelopment())
-{
+
     app.UseSwagger();
 
     app.UseSwaggerUI();
-}
+
 
 app.UseHttpsRedirection();
 
@@ -182,17 +181,19 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-
-    await RoleSeeder.SeedRolesAsync(services);
-
-    await SuperAdminSeeder.SuperAdminSeederAsync(services);
-}
-
 try
 {
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+
+        var db = services.GetRequiredService<ApplicationDbContext>();
+        await db.Database.MigrateAsync();
+
+        await RoleSeeder.SeedRolesAsync(services);
+        await SuperAdminSeeder.SuperAdminSeederAsync(services);
+    }
+
     Log.Information("SmartHealth Care API Started Successfully");
 
     app.Run();
@@ -200,6 +201,7 @@ try
 catch (Exception ex)
 {
     Log.Fatal(ex, "Application terminated unexpectedly");
+    throw;
 }
 finally
 {
