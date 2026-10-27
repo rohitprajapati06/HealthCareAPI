@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Cryptography;
 using Microsoft.OpenApi.Models;
 using SmartHealthcare.Application;
 using SmartHealthcare.Application.Common.Settings;
@@ -170,6 +171,44 @@ app.UseSwaggerUI(c =>
 
 
 app.UseHttpsRedirection();
+
+var backendSecret = builder.Configuration["BackendAccess:Secret"];
+
+if (string.IsNullOrWhiteSpace(backendSecret))
+{
+    throw new InvalidOperationException(
+        "Backend access secret is not configured.");
+}
+
+app.Use(async (context, next) =>
+{
+    if (!context.Request.Headers.TryGetValue(
+            "X-Backend-Access", out var providedSecret))
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+
+        await context.Response.WriteAsJsonAsync(
+            new { message = "Forbidden" });
+
+        return;
+    }
+
+    var expectedBytes = Encoding.UTF8.GetBytes(backendSecret);
+    var providedBytes = Encoding.UTF8.GetBytes(providedSecret.ToString());
+
+    if (!CryptographicOperations.FixedTimeEquals(
+            expectedBytes, providedBytes))
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+
+        await context.Response.WriteAsJsonAsync(
+            new { message = "Forbidden" });
+
+        return;
+    }
+
+    await next();
+});
 
 app.UseStaticFiles();
 
